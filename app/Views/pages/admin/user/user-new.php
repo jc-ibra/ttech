@@ -188,6 +188,17 @@
                   <label class="form-check-label" for="hide_emails">Ocultar E-mails del directorio</label>
                 </div>
               </div>
+              <div class="col-md-6 col-lg-4 d-flex align-items-end">
+                <div class="mb-3 form-check">
+                  <input 
+                    type="checkbox" 
+                    class="form-check-input" 
+                    id="show_in_directory" 
+                    name="show_in_directory" 
+                  >
+                  <label class="form-check-label" for="show_in_directory">Mostrar en directorio</label>
+                </div>
+              </div>
             </div>
             <hr>
             <div class="row">

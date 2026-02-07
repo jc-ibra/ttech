@@ -11,7 +11,7 @@ class UserModel extends Model{
     protected $useAutoIncrement   = true;
     protected $returnType         = "object";
     protected $useSoftDeletes     = true;
-    protected $allowedFields      = ['name', 'lastname', 'email', 'password', 'last_login', 'active', 'photo', 'parent', 'rol', 'ocupation', 'telephone', 'email_secondary', 'cellphone', 'ext', 'date_entry', 'date_discharge', 'employee_number', 'hide_emails', 'ghost', 'has_ghost', 'real_parent', 'department', 'niveles', 'area', 'reingreso'];
+    protected $allowedFields      = ['name', 'lastname', 'email', 'password', 'last_login', 'active', 'photo', 'parent', 'rol', 'ocupation', 'telephone', 'email_secondary', 'cellphone', 'ext', 'date_entry', 'date_discharge', 'employee_number', 'hide_emails', 'show_in_directory', 'ghost', 'has_ghost', 'real_parent', 'department', 'niveles', 'area', 'reingreso'];
     protected $useTimestamps      = true;
     protected $createdField       = 'created_at';
     protected $updatedField       = 'updated_at';
@@ -42,7 +42,8 @@ class UserModel extends Model{
         $this->join('ocupations', 'ocupations.id = users.ocupation')
              ->join('users as parent', 'parent.id = users.parent', 'left')
              ->select('users.*, ocupations.name as ocupation_name, CONCAT(parent.name, " ", parent.lastname) as parent_name, CONCAT(users.name, " ", users.lastname) as complete_name')
-             ->where('users.active', 1);
+             ->where('users.active', 1)
+             ->where('users.show_in_directory', 1);
 
         return $this->orderBy('created_at', 'DESC')->findAll();
     }
@@ -52,7 +53,7 @@ class UserModel extends Model{
         return $this->where('email', $email)->first();
     }
 
-    public function createUser($name, $lastname, $email, $password, $photo, $telephone, $rol, $ocupation, $department, $parent, $email_secondary, $cellphone, $ext, $date_entry, $employee_number, $hide_emails, $ghost, $has_ghost, $real_parent, $niveles, $area)
+    public function createUser($name, $lastname, $email, $password, $photo, $telephone, $rol, $ocupation, $department, $parent, $email_secondary, $cellphone, $ext, $date_entry, $employee_number, $hide_emails, $show_in_directory, $ghost, $has_ghost, $real_parent, $niveles, $area)
     {
         $data = [
             'name'        => $name,
@@ -71,6 +72,7 @@ class UserModel extends Model{
             'date_entry'  => $date_entry,
             'employee_number' => $employee_number,
             'hide_emails' => $hide_emails,  
+            'show_in_directory' => $show_in_directory,
             'ghost'       => $ghost,
             'has_ghost'   => $has_ghost,
             'real_parent' => $real_parent,
@@ -125,7 +127,7 @@ class UserModel extends Model{
         ]);
     }
     
-    public function updateUser($id, $name, $lastname, $email, $photo, $telephone, $rol, $ocupation, $department, $parent, $email_secondary, $cellphone, $ext, $date_entry, $date_discharge, $employee_number, $hide_emails, $ghost, $has_ghost, $real_parent, $niveles, $area)
+    public function updateUser($id, $name, $lastname, $email, $photo, $telephone, $rol, $ocupation, $department, $parent, $email_secondary, $cellphone, $ext, $date_entry, $date_discharge, $employee_number, $hide_emails, $show_in_directory, $ghost, $has_ghost, $real_parent, $niveles, $area)
     {
         return $this->update($id, [
             'name'        => $name,
@@ -144,6 +146,7 @@ class UserModel extends Model{
             'date_discharge' => $date_discharge,
             'employee_number' => $employee_number,
             'hide_emails' => $hide_emails,
+            'show_in_directory' => $show_in_directory,
             'ghost'       => $ghost,
             'has_ghost'   => $has_ghost,
             'real_parent' => $real_parent,
