@@ -84,9 +84,8 @@ $(document).ready(function() {
             $('#chart-container').orgchart({
                 'data': data,
                 'nodeTitle': 'title',
-                'nodeContent': null,
+                'nodeContent': 'name',
                 'createNode': function($node, data) {
-                    $node.find('.content').remove();
                     var titleText = (data && typeof data.title !== 'undefined' && data.title !== null) ? String(data.title).trim() : '';
                     if (!titleText || titleText.toLowerCase() === 'null') {
                         if (typeof data.pid === 'undefined' || data.pid === null || data.pid === 0) {

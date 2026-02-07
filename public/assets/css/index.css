@@ -606,12 +606,12 @@ a{
 .normal__node>i{
     display: none !important;
 }
-.organization__page .orgchart .node .content{
+/*.organization__page .orgchart .node .content{
     display: none !important;
-}
+}*/
 .organization__page .orgchart .node .title{
-    border-bottom-left-radius: 10px !important;
-    border-bottom-right-radius: 10px !important;
+    /*border-bottom-left-radius: 10px !important;
+    border-bottom-right-radius: 10px !important;*/
     padding-left: 16px !important;
 }
 /* Sidebar Collapse */
