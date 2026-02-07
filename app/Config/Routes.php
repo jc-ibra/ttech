@@ -41,6 +41,7 @@ $routes->group('', ['filter' => 'auth:admin,operator,user'], function($routes) {
     $routes->get('/organization/data', 'Organization::getOrganization');
     $routes->get('/organization/data/department/(:num)', 'Organization::getOrganizationByDepartment/$1');
     $routes->get('/organization/data/area/(:num)', 'Organization::getOrganizationByArea/$1');
+    $routes->get('/organization/data/general/(:num)', 'Organization::getGeneralOrganigram/$1');
 
     
 });

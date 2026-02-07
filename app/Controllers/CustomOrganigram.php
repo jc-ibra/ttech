@@ -58,6 +58,7 @@ class CustomOrganigram extends BaseController
     {
         $name        = $this->request->getPost('name');
         $description = $this->request->getPost('description');
+        $show_in_general = $this->request->getPost('show_in_general');
         $users       = $this->request->getPost('users'); // Array de usuarios
         $created_by  = session('user')->id;
 
@@ -70,7 +71,7 @@ class CustomOrganigram extends BaseController
         }
 
         // Crear organigrama
-        $organigramaId = $this->customOrganigramModel->createOrganigrama($name, $description, $created_by);
+        $organigramaId = $this->customOrganigramModel->createOrganigrama($name, $description, $created_by, $show_in_general == 'on' ? 1 : 0);
 
         if (!$organigramaId) {
             return $this->response->setJSON([
@@ -140,6 +141,7 @@ class CustomOrganigram extends BaseController
         $id          = $this->request->getPost('id');
         $name        = $this->request->getPost('name');
         $description = $this->request->getPost('description');
+        $show_in_general = $this->request->getPost('show_in_general');
         $users       = $this->request->getPost('users'); // Array de usuarios
 
         // Validar
@@ -151,7 +153,7 @@ class CustomOrganigram extends BaseController
         }
 
         // Actualizar organigrama
-        $updated = $this->customOrganigramModel->updateOrganigrama($id, $name, $description);
+        $updated = $this->customOrganigramModel->updateOrganigrama($id, $name, $description, $show_in_general == 'on' ? 1 : 0);
 
         if (!$updated) {
             return $this->response->setJSON([
@@ -313,6 +315,11 @@ class CustomOrganigram extends BaseController
         $data = $this->customOrganigramUserModel->getOrganigramChartData($id);
         
         return $this->response->setJSON($data);
+    }
+   
+    public function getOrganigramDataGeneral($id)
+    {        
+        return $this->customOrganigramUserModel->getOrganigramChartData($id);
     }
 
     /**

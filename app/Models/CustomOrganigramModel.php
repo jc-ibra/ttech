@@ -11,7 +11,7 @@ class CustomOrganigramModel extends Model
     protected $useAutoIncrement   = true;
     protected $returnType         = "object";
     protected $useSoftDeletes     = true;
-    protected $allowedFields      = ['name', 'description', 'created_by', 'active'];
+    protected $allowedFields      = ['name', 'description', 'created_by', 'active', 'show_in_general'];
     protected $useTimestamps      = true;
     protected $createdField       = 'created_at';
     protected $updatedField       = 'updated_at';
@@ -38,12 +38,13 @@ class CustomOrganigramModel extends Model
     /**
      * Crear un nuevo organigrama
      */
-    public function createOrganigrama($name, $description, $created_by)
+    public function createOrganigrama($name, $description, $created_by, $show_in_general = 0)
     {
         $data = [
-            'name'        => $name,
-            'description' => $description,
-            'created_by'  => $created_by,
+            'name'             => $name,
+            'description'      => $description,
+            'created_by'       => $created_by,
+            'show_in_general'  => $show_in_general,
         ];
 
         return $this->insert($data);
@@ -52,11 +53,12 @@ class CustomOrganigramModel extends Model
     /**
      * Actualizar un organigrama
      */
-    public function updateOrganigrama($id, $name, $description)
+    public function updateOrganigrama($id, $name, $description, $show_in_general = 0)
     {
         return $this->update($id, [
-            'name'        => $name,
-            'description' => $description,
+            'name'             => $name,
+            'description'      => $description,
+            'show_in_general'  => $show_in_general,
         ]);
     }
 
@@ -74,5 +76,16 @@ class CustomOrganigramModel extends Model
     public function toggleActive($id, $active)
     {
         return $this->update($id, ['active' => $active]);
+    }
+
+    /**
+     * Obtener organigramas marcados como "mostrar en general"
+     */
+    public function getGeneralOrganigramas()
+    {
+        return $this->where('show_in_general', 1)
+                    ->where('active', 1)
+                    ->orderBy('name', 'ASC')
+                    ->findAll();
     }
 }

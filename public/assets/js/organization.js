@@ -10,14 +10,15 @@ $(document).ready(function() {
         allowClear: true,
     });
 
+    $('.select2general').select2({
+        placeholder: 'General',
+        allowClear: true,
+    });
+
     $('#department').on('change', function() {
-        let area = $('#area').val();
-        if(area != ""){
-            $('#area').select2('data', null);
-        }
         var department = $(this).val();
         if (department) {
-            showOrganization(department, null);
+            showOrganization(department, null, null);
         }
         else {
             showOrganization();
@@ -25,14 +26,19 @@ $(document).ready(function() {
     });
 
     $('#area').on('change', function() {
-        let department = $('#department').val();
-        if(department != ""){
-            $('#department').select2('data', null);
-        }
-        
         var area = $(this).val();
         if (area) {
-            showOrganization(null, area);
+            showOrganization(null, area, null);
+        }
+        else {
+            showOrganization();
+        }
+    });
+
+    $('#general').on('change', function() {
+        var general = $(this).val();
+        if (general) {
+            showOrganization(null, null, general);
         }
         else {
             showOrganization();
@@ -40,21 +46,41 @@ $(document).ready(function() {
     });
 
     // Inicializa el organigrama
-    function showOrganization( department = null, area = null ) {
-        var api_url = base_url + 'organization/data';
-        if (department) {
-            api_url += '/department/' + department;
+    function showOrganization( department = null, area = null, general = null) {
+
+        let option;
+        if(department != null ){
+            option = 'department'
         }
-        if (area) {
-            api_url += '/area/' + area;
+        if(area != null){
+            option = 'area'
         }
+        if(general != null){
+            option = 'general'
+        }
+
+        switch (option) {
+            case 'department':
+                var api_url = base_url + 'organization/data/department/' + department;
+                break;
+            case 'area':
+                var api_url = base_url + 'organization/data/area/' + area;
+                break;
+            case 'general':
+                var api_url = base_url + 'organization/data/general/' + general;
+                break;
+            default:
+                var api_url = base_url + 'organization/data';
+        }
+                
         $.ajax({
             'url': api_url,
             'dataType': 'json'
         })
         .done(function(data) {
+            console.log('me llame')
             datascource = data;
-            $('#chart-container').empty(); // Limpia el contenedor del organigrama
+            $('#chart-container').empty();
             $('#chart-container').orgchart({
                 'data': data,
                 'nodeTitle': 'title',

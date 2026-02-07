@@ -20,6 +20,14 @@
                 <?php endforeach; ?>
               </select>
             </div>
+            <div class="col-md-3">
+              <select class="form-select select2general" name="general" id="general">
+                <option value="">Selecciona organigrama</option>
+                <?php foreach($generalOrganigramas as $organigrama): ?>
+                  <option value="<?= $organigrama->id ?>"><?= $organigrama->name ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
           </div>
         </div>
       </div>

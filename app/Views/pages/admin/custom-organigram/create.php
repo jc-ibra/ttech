@@ -22,6 +22,15 @@
                 <label for="description" class="form-label">Descripción</label>
                 <input type="text" class="form-control" id="description" name="description" placeholder="Descripción opcional">
               </div>
+              <div class="col-md-12 mb-3">
+                <div class="form-check">
+                  <input type="checkbox" class="form-check-input" id="show_in_general" name="show_in_general">
+                  <label class="form-check-label" for="show_in_general">
+                    Mostrar en selector general de organigrama
+                  </label>
+                  <small class="d-block text-muted">Si está marcado, este organigrama estará disponible en el selector "Generales" del organigrama principal</small>
+                </div>
+              </div>
             </div>
 
             <div id="usersContainer">
@@ -36,7 +45,6 @@
                     </tr>
                   </thead>
                   <tbody id="userRows">
-                    <!-- Las filas se agregarán dinámicamente -->
                   </tbody>
                 </table>
               </div>
