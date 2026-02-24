@@ -1,19 +1,19 @@
 {
- "schemaVersion" :2 ,
-  "dockerfileLines": [
-  						"FROM php:8.2-apache",
-  						"RUN apt-get -y update",
-  						"RUN apt-get install -y libicu-dev",
-  						"RUN docker-php-ext-configure intl",
-  						"RUN docker-php-ext-install intl",
-  						"RUN docker-php-ext-install mysqli",
-  						"RUN sed -i 's/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf",
-  						"RUN sed -ri -e 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/*.conf",
-  						"COPY . /var/www/html/",
-						"RUN mkdir -p /var/www/html/public/uploads",
-  						"RUN chown -R www-data:www-data /var/www/html/writable",
-        				"RUN chown -R www-data:www-data /var/www/html/public/uploads",
-  						"RUN a2enmod rewrite",
-  						"RUN service apache2 restart"
-                    ]
+ 	"schemaVersion" :2 ,
+  	"dockerfileLines": [
+		"FROM php:8.2-apache",
+		"RUN apt-get -y update",
+		"RUN apt-get install -y libicu-dev",
+		"RUN docker-php-ext-configure intl",
+		"RUN docker-php-ext-install intl",
+		"RUN docker-php-ext-install mysqli",
+		"RUN sed -i 's/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf",
+		"RUN sed -ri -e 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/*.conf",
+		"COPY . /var/www/html/",
+		"RUN mkdir -p /var/www/html/public/uploads",
+		"RUN chown -R www-data:www-data /var/www/html/writable",
+		"RUN chown -R www-data:www-data /var/www/html/public/uploads",
+		"RUN a2enmod rewrite",
+		"RUN service apache2 restart"
+	]
 }

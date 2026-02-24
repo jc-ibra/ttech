@@ -1,60 +1,127 @@
-# CodeIgniter 4 Framework
+# Intranet Trantor Technologies
 
-## What is CodeIgniter?
+Sistema de gestión corporativa desarrollado con **CodeIgniter 4** para Trantor Technologies.
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+## Resumen
 
-This repository holds the distributable version of the framework.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+La aplicación centraliza procesos internos de la empresa, incluyendo:
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+- Autenticación y control de acceso por roles (Admin, Operator, User)
+- Gestión de usuarios y perfiles
+- Organigramas organizacionales y personalizados
+- Gestión documental (carpetas, archivos, descargas)
+- Feed interno de noticias (**Trantor Informa**)
+- Sistema de quejas y sugerencias
+- Directorio de empleados y alertas
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
+## Requisitos
 
-## Important Change with index.php
+### Requisitos mínimos
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+- PHP **8.1+** (recomendado 8.2)
+- Apache **2.4+** con `mod_rewrite` habilitado
+- MySQL **5.7+** o MariaDB **10.3+**
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+### Extensiones PHP requeridas
 
-**Please** read the user guide for a better explanation of how CI4 works!
+- `intl`
+- `mbstring`
+- `json`
+- `mysqlnd`
+- `curl`
+- `gd` o `imagick`
+- `fileinfo`
 
-## Repository Management
+### Herramientas de desarrollo
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+- Composer
+- Git
+- Node.js (opcional, para assets frontend)
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+## Instalación rápida
 
-## Contributing
+1. Clonar el repositorio
 
-We welcome contributions from the community.
+```bash
+git clone <repository-url>
+cd ttech
+```
 
-Please read the [*Contributing to CodeIgniter*](https://github.com/codeigniter4/CodeIgniter4/blob/develop/CONTRIBUTING.md) section in the development repository.
+2. Instalar dependencias
 
-## Server Requirements
+```bash
+composer install
+```
 
-PHP version 8.1 or higher is required, with the following extensions installed:
+3. Crear archivo de entorno
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
+```bash
+cp env .env
+```
 
-> [!WARNING]
-> - The end of life date for PHP 7.4 was November 28, 2022.
-> - The end of life date for PHP 8.0 was November 26, 2023.
-> - If you are still using PHP 7.4 or 8.0, you should upgrade immediately.
-> - The end of life date for PHP 8.1 will be December 31, 2025.
+4. Configurar `.env` (mínimo: `app.baseURL`, conexión de BD y `encryption.key`)
 
-Additionally, make sure that the following extensions are enabled in your PHP:
+5. Crear base de datos y ejecutar migraciones
 
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+```bash
+php spark migrate
+```
+
+6. Configurar permisos
+
+```bash
+chmod -R 775 writable/
+chmod -R 775 public/uploads/
+```
+
+## Despliegue en servidor (Apache)
+
+Configura el VirtualHost apuntando a `public/`:
+
+```apache
+<VirtualHost *:80>
+	ServerName tu-dominio.com
+	DocumentRoot /var/www/ttech/public
+
+	<Directory /var/www/ttech/public>
+		Options -Indexes +FollowSymLinks
+		AllowOverride All
+		Require all granted
+	</Directory>
+
+	ErrorLog ${APACHE_LOG_DIR}/ttech-error.log
+	CustomLog ${APACHE_LOG_DIR}/ttech-access.log combined
+</VirtualHost>
+```
+
+Permisos recomendados en Linux:
+
+```bash
+sudo chown -R www-data:www-data /var/www/ttech
+sudo chmod -R 755 /var/www/ttech
+sudo chmod -R 775 /var/www/ttech/writable
+sudo chmod -R 775 /var/www/ttech/public/uploads
+```
+
+## Despliegue con Docker (opcional)
+
+El proyecto incluye `captain-definition` para despliegue en CapRover.
+
+Puntos clave del contenedor:
+
+- Imagen base `php:8.2-apache`
+- `DocumentRoot` apuntando a `/var/www/html/public`
+- `mod_rewrite` habilitado
+- Permisos sobre `writable/` y `public/uploads/`
+
+## Seguridad y producción
+
+- No subir `.env` al repositorio
+- Usar HTTPS en producción
+- Definir `CI_ENVIRONMENT = production`
+- Restringir permisos de escritura solo a carpetas necesarias
+- Monitorear logs y mantener respaldos
+
+---
+
+Para documentación completa y detalle de módulos/rutas, revisar `documentacion.md`.
