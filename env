@@ -66,17 +66,4 @@
 # LOGGER
 #--------------------------------------------------------------------
 
-# logger.threshold =
-
-#--------------------------------------------------------------------
-# EXTERNAL PROVISIONING
-#--------------------------------------------------------------------
-
-# GLPI (https://helpdesk.trantortechnologies.mx)
-# GLPI_URL = https://helpdesk.trantortechnologies.mx
-# GLPI_APP_TOKEN  = your-app-token-here
-# GLPI_USER_TOKEN = your-user-token-here
-
-# Mailcow
-# MAILCOW_URL     = https://mail.yourdomain.mx
-# MAILCOW_API_KEY = your-api-key-here
+# logger.threshold = 

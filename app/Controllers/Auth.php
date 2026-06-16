@@ -4,7 +4,6 @@ namespace App\Controllers;
 
 use App\Models\UserModel;
 use App\Controllers\HelperUtility;
-use App\Services\ProvisioningService;
 
 class Auth extends BaseController
 {
@@ -72,12 +71,10 @@ class Auth extends BaseController
             $ghost_user = $this->userModel->createUser($name, $lastname, $email . '_ghost', $passwordHash, $photoURL, $telephone, $rol, $ocupation, $department, $parent, $email_secondary, $cellphone, $ext, $date_entry, $employee_number, $hide_emails == 'on' ? 1 : 0, $show_in_directory == 'on' ? 1 : 0, 1, null, null, 1, $area);
 
             if ($this->userModel->createUser($name, $lastname, $email, $passwordHash, $photoURL, $telephone, $rol, $ocupation, $department, $ghost_user, $email_secondary, $cellphone, $ext, $date_entry, $employee_number, $hide_emails == 'on' ? 1 : 0, $show_in_directory == 'on' ? 1 : 0, null, $ghost_user, $parent, 1, $area)) {
-                $this->provisionNewEmployee($name, $lastname, $email, $telephone, $cellphone, $employee_number, $password);
                 return HelperUtility::redirectWithMessage('/user/new', lang('Success.user_created'), 'success');
             }
         } else {
             if ($this->userModel->createUser($name, $lastname, $email, $passwordHash, $photoURL, $telephone, $rol, $ocupation, $department, $parent, $email_secondary, $cellphone, $ext, $date_entry, $employee_number, $hide_emails == 'on' ? 1 : 0, $show_in_directory == 'on' ? 1 : 0, null, null, null, null, $area)) {
-                $this->provisionNewEmployee($name, $lastname, $email, $telephone, $cellphone, $employee_number, $password);
                 return HelperUtility::redirectWithMessage('/user/new', lang('Success.user_created'), 'success');
             }
         }
@@ -281,37 +278,6 @@ class Auth extends BaseController
     private function updateUserData(int $id, string $name, string $lastname, string $email, string $photo, string $telephone, string $rol, string $ocupation, $department, $parent, $email_secondary, $cellphone, $ext, $date_entry, $date_discharge, $employee_number, $hide_emails, $show_in_directory, $ghost, $has_ghost, $real_parent, $niveles, $area): bool
     {
         return $this->userModel->updateUser($id, $name, $lastname, $email, $photo, $telephone, $rol, $ocupation, $department == 0 ? null : $department, $parent, $email_secondary, $cellphone, $ext, $date_entry, $date_discharge, $employee_number, $hide_emails, $show_in_directory, $ghost, $has_ghost, $real_parent, $niveles, $area);
-    }
-
-    /**
-     * Llama a GLPI y Mailcow de forma independiente.
-     * Un fallo en uno no bloquea al otro ni revierte el alta en BD.
-     */
-    private function provisionNewEmployee(string $name, string $lastname, string $email, ?string $telephone, ?string $cellphone, string $employeeNumber, string $password): void
-    {
-        $provisioning = new ProvisioningService();
-
-        $data = [
-            'nombre'          => $name,
-            'apellidos'       => $lastname,
-            'email'           => $email,
-            'telefono'        => $telephone  ?? '',
-            'celular'         => $cellphone  ?? '',
-            'numero_empleado' => $employeeNumber,
-            'password'        => $password,
-        ];
-
-        try {
-            $provisioning->createGlpiUser($data);
-        } catch (\Throwable $e) {
-            log_message('error', '[Auth] Provisionamiento GLPI falló para "' . $email . '": ' . $e->getMessage());
-        }
-
-        try {
-            $provisioning->createMailcowMailbox($data);
-        } catch (\Throwable $e) {
-            log_message('error', '[Auth] Provisionamiento Mailcow falló para "' . $email . '": ' . $e->getMessage());
-        }
     }
 
     /**
