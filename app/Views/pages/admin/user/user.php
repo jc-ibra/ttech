@@ -1,107 +1,66 @@
 <div class="container-fluid mw-1600">
-  <div class="row">
-    <div class="col-lg-12 d-flex align-items-stretch">
-      <div class="card w-100">
-        <div class="card-body p-4">
-          <div class="d-flex justify-content-between align-items-center">
-            <h5 class="card-title fw-semibold m-0">Empleados</h5>
-            <div class="d-flex gap-2">
-              <button class="btn btn-outline-secondary" id="btnBuscar">Buscar</button>
-              <a href="<?= base_url('user/new') ?>" class="btn btn-outline-primary d-block">Nuevo</a>
-            </div>
-          </div>
-          <div class="mt-5 table-responsive directory">
-            <table class="table text-nowrap table-hover mb-0 align-middle" id="dt_table_users">
-              <thead class="text-dark fs-4">
-                <tr>
-                  <th class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0">Nombre</h6>
-                  </th>
-                  <th class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0">Jefe directo</h6>
-                  </th>
-                  <th class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0">E-mail</h6>
-                  </th>
-                  <th class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0">No. Empleado</h6>
-                  </th>
-                  <th class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0">Estatus</h6>
-                  </th>
-                  <th class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0">Conexión</h6>
-                  </th>
-                  <th class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0">Rol</h6>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <?php foreach($users as $user): ?>
-                  <?php if( !$user->ghost ): ?>
-                    <tr>
-                      <td class="border-bottom-0">
-                        <div class="d-flex align-items-center">
-                          <img
-                            class="rounded-circle" width="35" height="35"
-                            alt="<?= $user->name ?>"
-                            src="<?= base_url( $user->photo) ?>"
-                          />
-                          <div class="ms-2">
-                            <a class="btn p-1 px-2" style="color:var(--primary);" href="<?= base_url('user/edit/'.$user->id) ?>">
-                              <?= $user->name ?> <?= $user->lastname ?>
-                            </a>
-                          </div>
-                        </div>
-                      </td>
-                      <td class="border-bottom-0">
-                        <p class="mb-0 fw-normal">
-                          <?= $user->parent_name ?>
-                        </p>
-                      </td>
-                      <td class="border-bottom-0">
-                        <p class="mb-0 fw-normal">
-                          <?= $user->email ?>
-                        </p>
-                      </td>
-                      <td class="border-bottom-0">
-                        <p class="mb-0 fw-normal">
-                          <?= $user->employee_number ?>
-                        </p>
-                      </td>
-                      <td class="border-bottom-0">
-                        <div class="d-flex align-items-center gap-2">
-                          <span class="<?= $user->active == 1 ? 'bg-success' : 'bg-danger' ?> badge rounded-3 fw-semibold">
-                            <?= $user->active == 1 ? 'Activo' : 'Inactivo' ?>
-                          </span>
-                        </div>
-                      </td>
-                      <td class="border-bottom-0">
-                        <p class="mb-0 fw-normal">
-                          <?= $user->last_login == NULL ? 'Sin actividad' : $user->last_login ?>
-                        </p>
-                      </td>
-                      <td class="border-bottom-0">
-                        <p class="mb-0 fw-normal">
-                          <?php
-                            if ($user->rol == 'admin') {
-                              echo 'Administrador';
-                            } elseif ($user->rol == 'operator') {
-                              echo 'Operador';
-                            } else {
-                              echo 'Usuario';
-                            }
-                          ?>
-                        </p>
-                      </td>
-                    </tr>     
-                  <?php endif ?>
-                <?php endforeach ?>
-              </tbody>
-            </table>
-          </div>
+  <div class="card">
+    <div class="card-body p-4">
+      <div class="page-header">
+        <div>
+          <h5 class="page-header__title">Empleados</h5>
+          <p class="page-header__subtitle">Gestión de empleados y accesos</p>
         </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-secondary" id="btnBuscar">
+            <i class="ti ti-search me-1"></i>Buscar
+          </button>
+          <a href="<?= base_url('user/new') ?>" class="btn btn-primary">
+            <i class="ti ti-plus me-1"></i>Nuevo
+          </a>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle" id="dt_table_users">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Jefe directo</th>
+              <th>E-mail</th>
+              <th>No. Empleado</th>
+              <th>Estatus</th>
+              <th>Ultima conexion</th>
+              <th>Rol</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach($users as $user): ?>
+              <?php if( !$user->ghost ): ?>
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      <img class="rounded-circle" width="32" height="32" alt="<?= $user->name ?>" src="<?= base_url($user->photo) ?>" style="object-fit:cover;">
+                      <a class="fw-semibold text-primary text-decoration-none" href="<?= base_url('user/edit/'.$user->id) ?>">
+                        <?= $user->name ?> <?= $user->lastname ?>
+                      </a>
+                    </div>
+                  </td>
+                  <td><?= $user->parent_name ?? '-' ?></td>
+                  <td><?= $user->email ?></td>
+                  <td><?= $user->employee_number ?></td>
+                  <td>
+                    <span class="<?= $user->active == 1 ? 'badge-success' : 'badge-critical' ?>">
+                      <?= $user->active == 1 ? 'Activo' : 'Inactivo' ?>
+                    </span>
+                  </td>
+                  <td><?= $user->last_login ?? 'Sin actividad' ?></td>
+                  <td>
+                    <?php
+                      if ($user->rol == 'admin') echo 'Administrador';
+                      elseif ($user->rol == 'operator') echo 'Operador';
+                      else echo 'Usuario';
+                    ?>
+                  </td>
+                </tr>
+              <?php endif ?>
+            <?php endforeach ?>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

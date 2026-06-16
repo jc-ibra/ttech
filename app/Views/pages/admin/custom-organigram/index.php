@@ -1,62 +1,42 @@
 <div class="container-fluid mw-1600">
-  <div class="row">
-    <div class="col-lg-12 d-flex align-items-stretch">
-      <div class="card w-100">
-        <div class="card-body p-4">
-          <div class="d-flex justify-content-between align-items-center">
-            <h5 class="card-title fw-semibold m-0">Organigramas</h5>
-            <?php if(session()->get('user')->rol === 'admin'): ?>
-            <div class="d-flex gap-2">
-              <a href="<?= base_url('custom-organigram/create') ?>" class="btn btn-outline-primary d-block">
-                <i class="ti ti-plus"></i> Crear Organigrama
-              </a>
-            </div>
-            <?php endif; ?>
-          </div>
-          <div class="mt-5 table-responsive">
-            <table class="table text-nowrap table-hover mb-0 align-middle" id="dt_organigramas">
-              <thead class="text-dark fs-4">
+  <div class="card">
+    <div class="card-body p-4">
+      <div class="page-header">
+        <div>
+          <h5 class="page-header__title">Organigramas personalizados</h5>
+          <p class="page-header__subtitle">Crea y gestiona organigramas del equipo</p>
+        </div>
+        <?php if(session()->get('user')->rol === 'admin'): ?>
+        <a href="<?= base_url('custom-organigram/create') ?>" class="btn btn-primary">
+          <i class="ti ti-plus me-1"></i>Crear organigrama
+        </a>
+        <?php endif; ?>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle" id="dt_organigramas">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Fecha creación</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php if(empty($organigramas)): ?>
+              <tr>
+                <td colspan="4" class="text-center py-5">
+                  <i class="ti ti-sitemap" style="font-size:2.5rem; color:var(--color-neutral-300);"></i>
+                  <p class="text-muted mt-2 mb-0">No hay organigramas creados aún</p>
+                </td>
+              </tr>
+            <?php else: ?>
+              <?php foreach($organigramas as $organigrama): ?>
                 <tr>
-                  <th class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0">Nombre</h6>
-                  </th>
-                  <th class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0">Descripción</h6>
-                  </th>
-                  <th class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0">Fecha creación</h6>
-                  </th>
-                  <th class="border-bottom-0">
-                    <h6 class="fw-semibold mb-0">Acciones</h6>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <?php if(empty($organigramas)): ?>
-                  <tr>
-                    <td colspan="4" class="text-center py-4">
-                      <p class="text-muted">No hay organigramas creados aún</p>
-                    </td>
-                  </tr>
-                <?php else: ?>
-                  <?php foreach($organigramas as $organigrama): ?>
-                    <tr>
-                      <td class="border-bottom-0">
-                        <p class="mb-0 fw-semibold">
-                          <?= $organigrama->name ?>
-                        </p>
-                      </td>
-                      <td class="border-bottom-0">
-                        <p class="mb-0 fw-normal">
-                          <?= $organigrama->description ?? '-' ?>
-                        </p>
-                      </td>
-                      <td class="border-bottom-0">
-                        <p class="mb-0 fw-normal">
-                          <?= date('d/m/Y', strtotime($organigrama->created_at)) ?>
-                        </p>
-                      </td>
-                      <td class="border-bottom-0">
+                  <td class="fw-semibold"><?= $organigrama->name ?></td>
+                  <td><?= $organigrama->description ?? '-' ?></td>
+                  <td><?= date('d/m/Y', strtotime($organigrama->created_at)) ?></td>
+                  <td>
                         <div class="d-flex gap-2">
                           <a href="<?= base_url('custom-organigram/view/'.$organigrama->id) ?>" 
                              class="btn btn-sm btn-outline-primary" 
@@ -87,13 +67,11 @@
                             <?php endif; ?>
                         </div>
                       </td>
-                    </tr>
-                  <?php endforeach; ?>
-                <?php endif; ?>
-              </tbody>
-            </table>
-          </div>
-        </div>
+                </tr>
+              <?php endforeach; ?>
+            <?php endif; ?>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

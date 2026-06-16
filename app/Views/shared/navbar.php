@@ -33,7 +33,7 @@
             </svg>
           </div>
           <div id="bell__icon__on" style="display: none;">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="#8faaf4" viewBox="0 0 24 24" stroke-width="1.5" stroke="black" height="24" width="24">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="#57A5E0" viewBox="0 0 24 24" stroke-width="1.5" stroke="#1A1C1E" height="24" width="24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0M3.124 7.5A8.969 8.969 0 0 1 5.292 3m13.416 0a8.969 8.969 0 0 1 2.168 4.5" />
             </svg>
             <div id="bell__icon-indicator" class="notification bg-primary rounded-circle"></div>
@@ -52,13 +52,13 @@
             <div class="message-body">
               <a href="<?=base_url('/profile')?>" class="d-flex align-items-center gap-2 dropdown-item">
                 <i class="ti ti-user fs-6"></i>
-                <p class="mb-0 fs-3"><?= session('user')->email ?> </p>
+                <span class="mb-0 fs-3"><?= session('user')->email ?></span>
               </a>
               <a href="<?=base_url('/alerts')?>" class="d-flex align-items-center gap-2 dropdown-item">
                 <i class="ti ti-mail fs-6"></i>
-                <p class="mb-0 fs-3">Alertas</p>
+                <span class="mb-0 fs-3">Alertas</span>
               </a>
-              <a href="<?=base_url('/auth/logout')?>" class="btn btn-outline-primary mx-3 mt-2 d-block">Salir</a>
+              <a href="<?=base_url('/auth/logout')?>" class="btn btn-outline-danger mx-3 mt-2 d-block">Salir</a>
             </div>
           </div>
         </li>

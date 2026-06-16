@@ -21,7 +21,7 @@
                     >
                   </div>
                   <div class="mb-4">
-                    <label for="exampleInputPassword1" class="form-label">Password</label>
+                    <label for="exampleInputPassword1" class="form-label">Contraseña</label>
                     <div class="input-group">
                       <input 
                         type="password" 

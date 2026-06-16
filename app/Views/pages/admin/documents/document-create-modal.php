@@ -31,7 +31,7 @@
                                     required=""
                                     >
                             </div>
-                            <small id="error__indicator" style="color:red;">Coloca un nombre al archivo</small>
+                            <small id="error__indicator" class="field-required">Coloca un nombre al archivo</small>
                         </div>
                         <div class="mb-3 form-check">
                             <input 

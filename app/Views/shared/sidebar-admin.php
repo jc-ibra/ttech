@@ -67,7 +67,7 @@
         <div class="accordion-item">
           <h2 class="accordion-header" id="headingHelpDesk">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseHelpDesk" aria-expanded="false" aria-controls="collapseHelpDesk">
-              Hel Desk
+              Help Desk
             </button>
           </h2>
           <div id="collapseHelpDesk" class="accordion-collapse collapse" aria-labelledby="headingHelpDesk" data-bs-parent="#accordionSidebar">

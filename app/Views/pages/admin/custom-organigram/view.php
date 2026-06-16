@@ -27,7 +27,7 @@
       </div>
     </div>
   </div>
-  <div class="card b-s-none" style="padding-top: 60px !important;">
+  <div class="card b-s-none orgchart-offset">
     <div id="chart-container" class="min__h__100">
       <div class="text-center py-5">
         <div class="spinner-border text-primary" role="status">

@@ -1,46 +1,43 @@
 <div class="container-fluid">
-  <div class="row">
-    <div class="col-lg-12 d-flex align-items-stretch">
-      <div class="card w-100">
-        <div class="card-body p-4">
-          <div class="d-flex justify-content-between align-items-center">
-            <h5 class="card-title fw-semibold m-0">Nuevo area</h5>
-            <a href="<?= base_url('area') ?>" class="btn btn-outline-primary d-block">Volver</a>
-          </div>
-          <form method="post" class="py-4" action="<?= base_url('area/new') ?>">
-            <?php echo csrf_field(); ?>
-            <div class="row">
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label class="form-label">Nombre area</label>
-                  <div class="input-group">
-                    <span class="input-group-text"><i class="ti ti-topology-complex"></i></span>
-                    <input 
-                      placeholder="Nombre area"
-                      type="text" 
-                      id="name" 
-                      name="name" 
-                      class="form-control" 
-                      required=""
-                    >
-                  </div>
-                </div>
-              </div>
-            </div>
-            <?php if (session('message') !== null) : ?>
-              <div class="alert alert-danger">
-                <?= session('message'); ?>
-              </div>
-            <?php endif; ?>
-            <?php if (session('success') !== null) : ?>
-              <div class="alert alert-success">
-                <?= session('success'); ?>
-              </div>
-            <?php endif; ?>
-            <button type="submit" class="btn btn-outline-primary d-block">Crear tipo</button>
-          </form>
+  <div class="card">
+    <div class="card-body p-4">
+      <div class="page-header">
+        <div>
+          <h5 class="page-header__title">Nueva area</h5>
+          <p class="page-header__subtitle">Completa el nombre para crear el area</p>
         </div>
+        <a href="<?= base_url('area') ?>" class="btn btn-outline-secondary">
+          <i class="ti ti-arrow-left me-1"></i>Volver
+        </a>
       </div>
+      <form method="post" action="<?= base_url('area/new') ?>">
+        <?php echo csrf_field(); ?>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-4">
+              <label class="form-label" for="name">Nombre del area</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                class="form-control"
+                placeholder="Ej. Ventas Norte"
+                required=""
+              >
+            </div>
+          </div>
+        </div>
+        <?php if (session('message') !== null) : ?>
+          <div class="alert alert-danger mb-3"><?= session('message'); ?></div>
+        <?php endif; ?>
+        <?php if (session('success') !== null) : ?>
+          <div class="alert alert-success mb-3"><?= session('success'); ?></div>
+        <?php endif; ?>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Crear area</button>
+          <a href="<?= base_url('area') ?>" class="btn btn-outline-secondary">Cancelar</a>
+        </div>
+      </form>
     </div>
   </div>
 </div>
