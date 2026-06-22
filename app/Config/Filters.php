@@ -35,6 +35,7 @@ class Filters extends BaseFilters
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
         'auth'          => \App\Filters\AuthFilter::class,
+        'api_auth'      => \App\Filters\ApiAuthFilter::class,
     ];
 
     /**
@@ -77,12 +78,14 @@ class Filters extends BaseFilters
                     '/', // Excluir la raíz de la autenticación
                     'auth/login',
                     'extern/mo',
+                    'api/*',
                 ]
             ],
             'csrf' => [
                 'except' => [
                     'extern/mo',
                     'files/*',
+                    'api/*',
                 ]
             ],
             // 'invalidchars',

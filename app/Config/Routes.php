@@ -7,6 +7,17 @@ use CodeIgniter\Router\RouteCollection;
 */
 
 /**************************************
+ * API v1 — autenticación por Bearer token
+***************************************/
+$routes->group('api/v1', ['filter' => 'api_auth'], function ($routes) {
+    $routes->get('ping',                                'Api\Usuarios::ping');
+    $routes->post('usuarios',                          'Api\Usuarios::crear');
+    $routes->post('usuarios/(:segment)/desactivar',    'Api\Usuarios::desactivar/$1');
+    $routes->post('usuarios/(:segment)/password',      'Api\Usuarios::actualizarPassword/$1');
+    $routes->put('usuarios/(:segment)',                 'Api\Usuarios::actualizar/$1');
+});
+
+/**************************************
  * FUERA DE FILTRO DE AUTENTICACIÓN
 ***************************************/
 $routes->group('', function($routes) {
