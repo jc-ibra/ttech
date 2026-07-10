@@ -97,11 +97,77 @@ class Usuarios extends BaseController
             ], 500);
         }
 
-        return $this->json([
+        $respuesta = [
             'exito'      => true,
             'id_usuario' => 'INT-' . $id,
             'mensaje'    => 'Usuario creado',
-        ]);
+        ];
+
+        // Foto opcional: si Nexus la envía, se decodifica y se asocia al usuario.
+        // Si algo falla con la foto, el usuario ya quedó creado: solo advertimos.
+        if (!empty($body['foto_base64'])) {
+            $foto = $this->guardarFotoBase64($body['foto_base64'], $body['foto_mime'] ?? '');
+
+            if ($foto['ok']) {
+                $this->userModel->setNewPhoto($id, $foto['ruta']);
+            } else {
+                $respuesta['advertencia'] = 'Usuario creado, pero la foto no se pudo guardar: ' . $foto['mensaje'];
+            }
+        }
+
+        return $this->json($respuesta);
+    }
+
+    /**
+     * Decodifica una imagen en base64 (sin prefijo data:) y la guarda en
+     * public/uploads/images/profiles, igual que las fotos de perfil normales.
+     *
+     * @return array{ok: bool, ruta?: string, mensaje?: string}
+     */
+    private function guardarFotoBase64(string $base64, string $mime): array
+    {
+        $extensiones = [
+            'image/jpeg' => 'jpg',
+            'image/png'  => 'png',
+            'image/webp' => 'webp',
+        ];
+
+        if (!isset($extensiones[$mime])) {
+            return ['ok' => false, 'mensaje' => 'tipo MIME no soportado (use image/jpeg, image/png o image/webp)'];
+        }
+
+        // Tolerar un prefijo data: por si llegara, aunque el contrato pide base64 puro.
+        if (($coma = strpos($base64, ',')) !== false && str_starts_with($base64, 'data:')) {
+            $base64 = substr($base64, $coma + 1);
+        }
+
+        $binario = base64_decode($base64, true);
+        if ($binario === false) {
+            return ['ok' => false, 'mensaje' => 'foto_base64 no es un base64 válido'];
+        }
+
+        // Hasta ~2 MB de imagen original.
+        if (strlen($binario) > 2 * 1024 * 1024) {
+            return ['ok' => false, 'mensaje' => 'la imagen supera el tamaño máximo de 2 MB'];
+        }
+
+        // Verificar que el contenido realmente sea una imagen.
+        if (@getimagesizefromstring($binario) === false) {
+            return ['ok' => false, 'mensaje' => 'el contenido no es una imagen válida'];
+        }
+
+        $uploadPath = ROOTPATH . 'public/uploads/images/profiles';
+        if (!is_dir($uploadPath) && !mkdir($uploadPath, 0755, true) && !is_dir($uploadPath)) {
+            return ['ok' => false, 'mensaje' => 'no se pudo preparar el directorio de imágenes'];
+        }
+
+        $nombre = bin2hex(random_bytes(16)) . '.' . $extensiones[$mime];
+
+        if (file_put_contents($uploadPath . '/' . $nombre, $binario) === false) {
+            return ['ok' => false, 'mensaje' => 'no se pudo escribir la imagen en disco'];
+        }
+
+        return ['ok' => true, 'ruta' => 'uploads/images/profiles/' . $nombre];
     }
 
     // POST /api/v1/usuarios/{nexus_id}/desactivar
@@ -193,16 +259,45 @@ class Usuarios extends BaseController
             $data['password'] = password_hash($body['password'], PASSWORD_DEFAULT);
         }
 
+        // Foto opcional: si llega, reemplaza la actual; si no llega, se deja igual.
+        $advertenciaFoto = null;
+        $fotoAnterior    = null;
+        if (!empty($body['foto_base64'])) {
+            $foto = $this->guardarFotoBase64($body['foto_base64'], $body['foto_mime'] ?? '');
+
+            if ($foto['ok']) {
+                $data['photo'] = $foto['ruta'];
+                $fotoAnterior  = $user->photo;
+            } else {
+                $advertenciaFoto = 'La foto no se pudo actualizar: ' . $foto['mensaje'];
+            }
+        }
+
         if (empty($data)) {
-            return $this->json(['exito' => true, 'mensaje' => 'Sin cambios que aplicar']);
+            $respuesta = ['exito' => true, 'mensaje' => 'Sin cambios que aplicar'];
+            if ($advertenciaFoto) {
+                $respuesta['advertencia'] = $advertenciaFoto;
+            }
+            return $this->json($respuesta);
         }
 
         $this->userModel->update($user->id, $data);
 
-        return $this->json([
+        // Borrar la foto anterior solo si se reemplazó y no era la genérica.
+        if ($fotoAnterior && $fotoAnterior !== 'assets/images/anonimo.jpg'
+            && file_exists(ROOTPATH . 'public/' . $fotoAnterior)) {
+            @unlink(ROOTPATH . 'public/' . $fotoAnterior);
+        }
+
+        $respuesta = [
             'exito'      => true,
             'id_usuario' => 'INT-' . $user->id,
             'mensaje'    => 'Usuario actualizado',
-        ]);
+        ];
+        if ($advertenciaFoto) {
+            $respuesta['advertencia'] = $advertenciaFoto;
+        }
+
+        return $this->json($respuesta);
     }
 }
