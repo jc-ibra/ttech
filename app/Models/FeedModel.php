@@ -22,9 +22,11 @@ class FeedModel extends Model{
     
     private function baseFeedQuery()
     {
-        $this->select('feed.*, CONCAT(users.name, " ", users.lastname) as author_name, users.photo as author_photo, ocupations.name as author_ocupation, COUNT(feed_comments.id) as comments_count');
-        $this->join('users', 'users.id = feed.author');
-        $this->join('ocupations', 'ocupations.id = users.ocupation');
+        // El autor es una cuenta de login (users). Estas cuentas no tienen
+        // puesto (ocupation), así que author_ocupation queda vacío. LEFT JOIN
+        // para no ocultar publicaciones cuyo autor ya no exista.
+        $this->select('feed.*, CONCAT(users.name, " ", users.lastname) as author_name, users.photo as author_photo, \'\' as author_ocupation, COUNT(feed_comments.id) as comments_count');
+        $this->join('users', 'users.id = feed.author', 'left');
         $this->join('feed_comments', 'feed_comments.feed = feed.id', 'left');
         $this->groupBy('feed.id');
     }
@@ -66,7 +68,7 @@ class FeedModel extends Model{
         return $this->orderBy('feed.created_at', 'DESC')->findAll();
     }
 
-    public function createFeed($author, $body_content, $file_path = NULL, $image_path = NULL, $comments_active)
+    public function createFeed($author, $body_content, $file_path = NULL, $image_path = NULL, $comments_active = 1)
     {
         $data = [
             'author'        => $author,

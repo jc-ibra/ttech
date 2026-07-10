@@ -25,7 +25,9 @@ class CustomOrganigramModel extends Model
      */
     public function getOrganigramas($id = null)
     {
-        $this->join('users', 'users.id = custom_organigramas.created_by')
+        // created_by referencia una cuenta de login (users). LEFT JOIN para no
+        // ocultar organigramas cuyo creador ya no exista en la tabla de login.
+        $this->join('users', 'users.id = custom_organigramas.created_by', 'left')
              ->select('custom_organigramas.*, CONCAT(users.name, " ", users.lastname) as creator_name');
         
         if ($id !== null) {

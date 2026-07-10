@@ -1,6 +1,9 @@
 <div class="container-fluid">
   <div class="card">
     <div class="card-body p-4">
+      <a href="<?= base_url('catalogos') ?>" class="catalog-back">
+        <i class="ti ti-arrow-left"></i> Volver a Catálogos
+      </a>
       <div class="page-header">
         <div>
           <h5 class="page-header__title">Departamentos</h5>

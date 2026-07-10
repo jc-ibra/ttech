@@ -63,17 +63,15 @@ $routes->group('', ['filter' => 'auth:admin,operator,user'], function($routes) {
 ***************************************/
 $routes->group('', ['filter' => 'auth:admin,operator'], function($routes) {
 
-    /* Auth */
-    $routes->post('/auth/register', 'Auth::register');
-    $routes->post('/auth/user/update', 'Auth::updateUser');
-    $routes->post('/auth/user/active', 'Auth::activeUser');
-    $routes->post('/auth/user/inactive', 'Auth::inactiveUser');
-    $routes->post('/auth/user/reactivate', 'User::reingresarUsuario');
-    
-    /* Users */
-    $routes->get('/user', 'User::index');
-    $routes->get('/user/new', 'User::newUser');
-    $routes->get('/user/edit/(:num)', 'User::editUser/$1');
+    /* Empleados (organigrama) */
+    $routes->get('/empleados', 'Employee::index');
+    $routes->get('/empleados/new', 'Employee::newUser');
+    $routes->get('/empleados/edit/(:num)', 'Employee::editUser/$1');
+    $routes->post('/empleados/register', 'Employee::register');
+    $routes->post('/empleados/update', 'Employee::updateUser');
+    $routes->post('/empleados/active', 'Employee::activeUser');
+    $routes->post('/empleados/inactive', 'Employee::inactiveUser');
+    $routes->post('/empleados/reactivate', 'Employee::reingresarUsuario');
 
     /* Custom Organigram */
     $routes->get('/custom-organigram', 'CustomOrganigram::index');
@@ -122,7 +120,19 @@ $routes->group('', ['filter' => 'auth:admin,user'], function($routes) {
  * ADMINISTRADOR
 ***************************************/
 $routes->group('', ['filter' => 'auth:admin'], function($routes) {
-    
+
+    /* Usuarios (cuentas de login) */
+    $routes->get('/usuarios', 'User::index');
+    $routes->get('/usuarios/new', 'User::newUser');
+    $routes->get('/usuarios/edit/(:num)', 'User::editUser/$1');
+    $routes->post('/usuarios/create', 'User::create');
+    $routes->post('/usuarios/update', 'User::update');
+    $routes->post('/usuarios/active', 'User::activeUser');
+    $routes->post('/usuarios/inactive', 'User::inactiveUser');
+
+    /* Catálogos (hub de Puestos, Departamentos y Áreas) */
+    $routes->get('/catalogos', 'Catalogos::index');
+
     /* Ocupation */
     $routes->get('/ocupation', 'Ocupation::index');
     $routes->get('/ocupation/new', 'Ocupation::newOcupation');

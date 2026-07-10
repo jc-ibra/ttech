@@ -23,7 +23,7 @@ class FeedCommentModel extends Model{
     public function getFeedComments($feed)
     {
         $this->select('feed_comments.*, CONCAT(users.name, " ", users.lastname) as author_name, users.photo as author_photo');
-        $this->join('users', 'users.id = feed_comments.author');
+        $this->join('users', 'users.id = feed_comments.author', 'left');
         $this->where('feed_comments.feed', $feed);
         return $this->orderBy('feed_comments.created_at', 'DESC')->findAll();
     }
@@ -31,7 +31,7 @@ class FeedCommentModel extends Model{
     public function getFeedComment($id)
     {
         $this->select('feed_comments.*, CONCAT(users.name, " ", users.lastname) as author_name, users.photo as author_photo');
-        $this->join('users', 'users.id = feed_comments.author');
+        $this->join('users', 'users.id = feed_comments.author', 'left');
         return $this->where('feed_comments.id', $id)->first();
     }
 

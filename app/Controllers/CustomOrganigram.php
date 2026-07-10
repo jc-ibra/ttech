@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use App\Models\CustomOrganigramModel;
 use App\Models\CustomOrganigramUserModel;
-use App\Models\UserModel;
+use App\Models\EmployeeModel;
 
 class CustomOrganigram extends BaseController
 {
@@ -16,7 +16,7 @@ class CustomOrganigram extends BaseController
     {
         $this->customOrganigramModel     = new CustomOrganigramModel();
         $this->customOrganigramUserModel = new CustomOrganigramUserModel();
-        $this->userModel                 = new UserModel();
+        $this->userModel                 = new EmployeeModel();
     }
 
     /**

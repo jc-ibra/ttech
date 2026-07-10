@@ -23,7 +23,7 @@ class SuggestionModel extends Model{
     public function getSuggestions($id = null)
     {
         $this->select('suggestions.*, users.name as author_name, users.lastname as author_lastname, users.email as author_email, users.photo as author_photo');
-        $this->join('users', 'users.id = suggestions.author');
+        $this->join('users', 'users.id = suggestions.author', 'left');
 
         if($id !== null){
             return $this->where('suggestions.id', $id)->first();

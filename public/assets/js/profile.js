@@ -6,9 +6,6 @@ $(document).ready(function() {
 
         const name      = $('#name').val();
         const lastname  = $('#lastname').val();
-        const telephone = $('#telephone').val();
-        const cellphone = $('#cellphone').val();
-        const ext       = $('#ext').val();
 
         // Validate that name is not empty
         if (name.length === 0) {
@@ -16,20 +13,8 @@ $(document).ready(function() {
             return;
         }
 
-        // Validate that lastname is not empty
-        if (lastname.length === 0) {
-            showMessage('alert-danger', 'El apellido no puede estar vacío.');
-            return;
-        }
-
-        // Validate that cellphone is not empty
-        if (cellphone.length === 0) {
-            showMessage('alert-danger', 'El celular no puede estar vacío.');
-            return;
-        }
-
         // Send request
-        $.post(baseUrl + `/profile`, { [csrfName]: csrfHash, name, lastname, telephone, cellphone, ext }, handleResponse)
+        $.post(baseUrl + `/profile`, { [csrfName]: csrfHash, name, lastname }, handleResponse)
           .fail(() => showMessage('alert-danger', 'Error en la solicitud.'));
     });
     

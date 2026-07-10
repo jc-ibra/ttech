@@ -6,12 +6,12 @@
           <h5 class="page-header__title">Nuevo empleado</h5>
           <p class="page-header__subtitle">Los campos marcados con <span class="field-required">*</span> son obligatorios</p>
         </div>
-        <a href="<?= base_url('user') ?>" class="btn btn-outline-secondary">
+        <a href="<?= base_url('empleados') ?>" class="btn btn-outline-secondary">
           <i class="ti ti-arrow-left me-1"></i>Volver
         </a>
       </div>
 
-      <form method="post" action="<?= base_url('auth/register') ?>" enctype="multipart/form-data" id="register__form">
+      <form method="post" action="<?= base_url('empleados/register') ?>" enctype="multipart/form-data" id="register__form">
         <?php echo csrf_field(); ?>
 
         <!-- Sección 1: Datos personales -->
@@ -175,36 +175,6 @@
           </div>
         </div>
 
-        <!-- Sección 3: Acceso al sistema -->
-        <div class="form-section">
-          <h6 class="form-section__title">Acceso al sistema</h6>
-        </div>
-        <div class="row">
-          <div class="col-md-6 col-lg-4">
-            <div class="mb-4">
-              <label class="form-label">Rol <span class="field-required">*</span></label>
-              <select class="form-select select2" name="rol" required>
-                <option value="">Selecciona un rol</option>
-                <option value="user">Usuario</option>
-                <option value="operator">Operador</option>
-                <option value="admin">Administrador</option>
-              </select>
-            </div>
-          </div>
-          <div class="col-md-6 col-lg-4">
-            <div class="mb-3">
-              <label class="form-label" for="password">Contraseña <span class="field-required">*</span></label>
-              <input type="password" id="password" name="password" class="form-control" placeholder="Contraseña" required="">
-            </div>
-          </div>
-          <div class="col-md-6 col-lg-4">
-            <div class="mb-3">
-              <label class="form-label" for="password-confirm">Confirmar contraseña <span class="field-required">*</span></label>
-              <input type="password" id="password-confirm" name="password-confirm" class="form-control" placeholder="Repetir contraseña" required="">
-            </div>
-          </div>
-        </div>
-
         <?php if (session('message') !== null) : ?>
           <div class="alert alert-danger mb-3"><?= session('message'); ?></div>
         <?php endif; ?>
@@ -214,7 +184,7 @@
 
         <div class="form-actions">
           <button type="submit" class="btn btn-primary">Crear empleado</button>
-          <a href="<?= base_url('user') ?>" class="btn btn-outline-secondary">Cancelar</a>
+          <a href="<?= base_url('empleados') ?>" class="btn btn-outline-secondary">Cancelar</a>
         </div>
       </form>
     </div>

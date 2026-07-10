@@ -24,9 +24,9 @@ class CustomOrganigramUserModel extends Model
      */
     public function getUsersByOrganigrama($organigramaId)
     {
-        return $this->select('custom_organigrama_users.*, users.name, users.lastname, users.photo, ocupations.name as ocupation_name')
-                    ->join('users', 'users.id = custom_organigrama_users.user_id')
-                    ->join('ocupations', 'ocupations.id = users.ocupation', 'left')
+        return $this->select('custom_organigrama_users.*, employees.name, employees.lastname, employees.photo, ocupations.name as ocupation_name')
+                    ->join('employees', 'employees.id = custom_organigrama_users.user_id')
+                    ->join('ocupations', 'ocupations.id = employees.ocupation', 'left')
                     ->where('custom_organigrama_users.organigrama_id', $organigramaId)
                     ->orderBy('custom_organigrama_users.position_order', 'ASC')
                     ->findAll();

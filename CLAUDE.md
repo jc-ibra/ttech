@@ -49,17 +49,23 @@ HTTP → public/index.php → Routes (app/Config/Routes.php) → Filters (Auth/R
 - `app/Views/` — split into `shared/` (header, footer, sidebars) and `pages/{admin,user,shared}/`
 - `app/Filters/` — `AuthFilter.php` handles both authentication and role-based authorization
 
+**Usuarios vs Empleados (separación importante):** Son dos conceptos distintos en dos tablas distintas.
+- **Usuarios** (`users` / `UserModel` / `User` controller, rutas `/usuarios`): cuentas que **inician sesión**. Datos mínimos (`name`, `lastname`, `email`, `password`, `nexus_id`, `rol`, `active`). Los viewers (`rol='user'`) los administra **Nexus vía API** (`Api\Usuarios`, identificados por `nexus_id`); admin/operator se dan de alta manualmente.
+- **Empleados** (`employees` / `EmployeeModel` / `Employee` controller, rutas `/empleados`): nodos de los **organigramas**. Contienen puesto, área, departamento, jefe (`parent`), lógica *ghost*, foto, etc. **No inician sesión** (las columnas `password`/`rol`/`last_login` quedan como vestigiales; ver migración de separación).
+
 **Key modules:**
 | Module | Controller | Model |
 |--------|-----------|-------|
-| Auth/Profile | `Auth.php` | `UserModel.php` |
-| User management | `User.php` | `UserModel.php` |
+| Auth (login) | `Auth.php` | `UserModel.php` |
+| Usuarios (login) + Profile | `User.php` | `UserModel.php` |
+| Empleados (org) | `Employee.php` | `EmployeeModel.php` |
+| Nexus API | `Api/Usuarios.php` | `UserModel.php` |
 | News feed | `TrantorInforma.php` | `FeedModel.php` |
 | Documents | `Documents.php` | `DocumentModel.php` |
-| Org chart | `Organization.php`, `CustomOrganigram.php` | `CustomOrganigramModel.php` |
+| Org chart | `Organization.php`, `CustomOrganigram.php` | `EmployeeModel.php`, `CustomOrganigramModel.php` |
 | Suggestions | `Suggestion.php` | `SuggestionModel.php` |
 | Alerts | `Alert.php` | `AlertModel.php` |
-| Directory | `Directorio.php` | `UserModel.php` |
+| Directory | `Directorio.php` | `EmployeeModel.php` |
 
 ## Conventions
 

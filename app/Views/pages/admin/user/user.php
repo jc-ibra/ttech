@@ -10,7 +10,7 @@
           <button class="btn btn-outline-secondary" id="btnBuscar">
             <i class="ti ti-search me-1"></i>Buscar
           </button>
-          <a href="<?= base_url('user/new') ?>" class="btn btn-primary">
+          <a href="<?= base_url('empleados/new') ?>" class="btn btn-primary">
             <i class="ti ti-plus me-1"></i>Nuevo
           </a>
         </div>
@@ -24,8 +24,6 @@
               <th>E-mail</th>
               <th>No. Empleado</th>
               <th>Estatus</th>
-              <th>Ultima conexion</th>
-              <th>Rol</th>
             </tr>
           </thead>
           <tbody>
@@ -35,7 +33,7 @@
                   <td>
                     <div class="d-flex align-items-center gap-2">
                       <img class="rounded-circle" width="32" height="32" alt="<?= $user->name ?>" src="<?= base_url($user->photo) ?>" style="object-fit:cover;">
-                      <a class="fw-semibold text-primary text-decoration-none" href="<?= base_url('user/edit/'.$user->id) ?>">
+                      <a class="fw-semibold text-primary text-decoration-none" href="<?= base_url('empleados/edit/'.$user->id) ?>">
                         <?= $user->name ?> <?= $user->lastname ?>
                       </a>
                     </div>
@@ -47,14 +45,6 @@
                     <span class="<?= $user->active == 1 ? 'badge-success' : 'badge-critical' ?>">
                       <?= $user->active == 1 ? 'Activo' : 'Inactivo' ?>
                     </span>
-                  </td>
-                  <td><?= $user->last_login ?? 'Sin actividad' ?></td>
-                  <td>
-                    <?php
-                      if ($user->rol == 'admin') echo 'Administrador';
-                      elseif ($user->rol == 'operator') echo 'Operador';
-                      else echo 'Usuario';
-                    ?>
                   </td>
                 </tr>
               <?php endif ?>
@@ -121,7 +111,7 @@
   $('#irUsuario').on('click', function() {
     var userId = $('#userSearch').val();
     if(userId){
-      window.location.href = base_url + 'user/edit/' + userId;
+      window.location.href = base_url + 'empleados/edit/' + userId;
     }
   });
 </script>

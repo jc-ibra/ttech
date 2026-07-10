@@ -133,14 +133,16 @@ $(document).ready(function() {
         // Get values
         var folderId = data.node.id;
         var folderTitle = data.node.text;
-        $('#title__documents').html(folderTitle)
-        $('#createDocumentText').html('Crear documento en ' + folderTitle);
+        $('#title__documents').text(folderTitle);
+        $('#createDocumentText').text('Crear documento en ' + folderTitle);
         $('#parentInput').val(folderId);
 
         // Get files
         $.get(base_url + '/documents/file/' + folderId,  function(resp){
             if(resp.ok){
                 $('#document__list__container').html(resp.files);
+                var n = Array.isArray(resp.files_object) ? resp.files_object.length : 0;
+                $('#doc__count').text(n + (n === 1 ? ' archivo' : ' archivos')).show();
             }
         }
         ).fail(() => showMessage('alert-danger', 'Error en la solicitud.'));

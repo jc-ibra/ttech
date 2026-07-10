@@ -232,8 +232,8 @@ class Documents extends BaseController
                 $file_path      = json_encode($file);
                 $image_path     = null;
     
-                // Crear registro en BDD
-                $feed = $this->feedModel->createFeed($author, $body_content, $file_path, $image_path);
+                // Crear registro en BDD (comentarios habilitados por defecto)
+                $feed = $this->feedModel->createFeed($author, $body_content, $file_path, $image_path, 1);
     
                 // Crea una alerta a todos los usuarios del nuevo feed publicado
                 $users = $this->userModel->getUsers();

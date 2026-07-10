@@ -13,12 +13,12 @@
           <h5 class="page-header__title">Editar empleado</h5>
           <p class="page-header__subtitle">Los campos marcados con <span class="field-required">*</span> son obligatorios</p>
         </div>
-        <a href="<?= base_url('user') ?>" class="btn btn-outline-secondary">
+        <a href="<?= base_url('empleados') ?>" class="btn btn-outline-secondary">
           <i class="ti ti-arrow-left me-1"></i>Volver
         </a>
       </div>
 
-      <form method="post" action="<?= base_url('auth/user/update') ?>" enctype="multipart/form-data">
+      <form method="post" action="<?= base_url('empleados/update') ?>" enctype="multipart/form-data">
         <?php echo csrf_field(); ?>
         <input type="hidden" id="id" name="id" value="<?= $user->id ?>">
 
@@ -205,36 +205,6 @@
           <?php endif; ?>
         </div>
 
-        <!-- Sección 3: Acceso al sistema -->
-        <div class="form-section">
-          <h6 class="form-section__title">Acceso al sistema</h6>
-        </div>
-        <div class="row">
-          <div class="col-md-6 col-lg-4">
-            <div class="mb-4">
-              <label class="form-label">Rol <span class="field-required">*</span></label>
-              <select class="form-select select2" name="rol" required>
-                <option value="<?= $user->rol ?>">
-                  <?php
-                    if ($user->rol == 'admin') echo 'Administrador';
-                    elseif ($user->rol == 'operator') echo 'Operador';
-                    else echo 'Usuario';
-                  ?>
-                </option>
-                <option value="user">Usuario</option>
-                <option value="operator">Operador</option>
-                <option value="admin">Administrador</option>
-              </select>
-            </div>
-          </div>
-          <div class="col-md-6 col-lg-4">
-            <div class="mb-4">
-              <label class="form-label" for="password">Restablecer contraseña</label>
-              <input type="password" id="password" name="password" class="form-control" placeholder="Dejar en blanco para no cambiar">
-            </div>
-          </div>
-        </div>
-
         <div id="message__response" class="alert alert-success" style="display:none"></div>
         <?php if (session('message') !== null) : ?>
           <div class="alert alert-danger mb-3"><?= session('message'); ?></div>
@@ -287,7 +257,7 @@
 
 <script>
   var userId   = "<?= $user->id; ?>"
-  var baseUrl  = "<?= base_url('auth/user'); ?>"
+  var baseUrl  = "<?= base_url('empleados'); ?>"
   var csrfName = '<?= $data['csrfName']; ?>';
   var csrfHash = '<?= $data['csrfHash']; ?>';
 </script>

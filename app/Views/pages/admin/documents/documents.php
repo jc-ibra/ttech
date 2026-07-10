@@ -1,25 +1,43 @@
 <div class="container-fluid mw-1600">
-  <div class="card documents__wrapper">
+  <div class="card documents__wrapper doc-card">
     <div class="card-body">
-      <h5 class="card-title fw-semibold mb-4">Administrar Documentos</h5>
-      <div class="row">
-        <div class="col-lg-3 col-md-4 mb-4 mb-md-0">
-          <div id="folderTree"></div>
+
+      <div class="doc-head">
+        <div>
+          <h5 class="doc-head__title"><i class="ti ti-folders"></i> Administrar Documentos</h5>
+          <p class="doc-head__sub">Organiza carpetas y administra los archivos de la intranet.</p>
         </div>
+      </div>
+
+      <div class="row g-4">
+        <!-- Árbol de carpetas -->
+        <div class="col-lg-4 col-md-5">
+          <div class="doc-tree">
+            <div class="doc-tree__label"><i class="ti ti-sitemap"></i> Carpetas</div>
+            <div id="folderTree"></div>
+          </div>
+        </div>
+
+        <!-- Contenido de la carpeta -->
         <div class="col">
-          <div class="d-flex align-items-center justify-content-between align-items-center mb-3">
-            <h5 class="card-title fw-semibold m-0" id="title__documents"></h5>
-            <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createDocument">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="" height="18" width="18">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
-              </svg>
-              Cargar
-            </button>
+          <div class="doc-panel">
+            <div class="doc-panel__head">
+              <h5 class="doc-panel__title" id="title__documents"></h5>
+              <span class="doc-panel__count" id="doc__count" style="display:none;"></span>
+              <button type="button" class="btn btn-outline-primary btn-sm doc-panel__upload" data-bs-toggle="modal" data-bs-target="#createDocument">
+                <i class="ti ti-upload me-1"></i> Cargar
+              </button>
+            </div>
             <?php include('document-create-modal.php'); ?>
-          </div>  
-          <div id="documents__container" class="mt-2">
-            <ul id="document__list__container">              
-            </ul>
+            <div id="documents__container">
+              <ul id="document__list__container">
+                <li class="doc-placeholder">
+                  <div class="doc-placeholder__icon"><i class="ti ti-folder-open"></i></div>
+                  <h6>Selecciona una carpeta</h6>
+                  <p>Elige una carpeta del árbol para administrar sus documentos.</p>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>

@@ -3,16 +3,19 @@ $(document).ready(function() {
     $('.select2').select2({
         placeholder: 'Departamento',
         allowClear: true,
+        width: '100%',
     });
 
     $('.select2area').select2({
         placeholder: 'Area',
         allowClear: true,
+        width: '100%',
     });
 
     $('.select2general').select2({
         placeholder: 'General',
         allowClear: true,
+        width: '100%',
     });
 
     $('#department').on('change', function() {

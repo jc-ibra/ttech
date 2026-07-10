@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Models\UserModel;
+use App\Models\EmployeeModel;
 
 class Directorio extends BaseController
 {
@@ -11,7 +11,7 @@ class Directorio extends BaseController
 
     public function __construct()
     {
-        $this->userModel        = new UserModel();
+        $this->userModel        = new EmployeeModel();
     }
 
     public function index(): string

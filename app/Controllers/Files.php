@@ -41,9 +41,13 @@ class Files extends BaseController
                         $file->getClientMimeType(),
                         $file->getSize(),
                     );
-    
-                    return $folder . '/' . $newName;
-    
+
+                    // text/plain evita que CI inyecte el DebugBar (dev) en la
+                    // respuesta que FilePond guarda como id del archivo.
+                    return $this->response
+                        ->setContentType('text/plain')
+                        ->setBody($folder . '/' . $newName);
+
                 } else {
                     return $this->response->setJSON([
                         'status'    => 'error',
@@ -86,7 +90,11 @@ class Files extends BaseController
                     $file->getSize(),
                 );
 
-                return $folder . '/' . $newName;
+                // text/plain evita que CI inyecte el DebugBar (dev) en la
+                // respuesta que FilePond guarda como id del archivo.
+                return $this->response
+                    ->setContentType('text/plain')
+                    ->setBody($folder . '/' . $newName);
 
             } else {
                 return $this->response->setJSON([

@@ -3,290 +3,296 @@
 namespace App\Controllers;
 
 use App\Models\UserModel;
-use App\Models\OcupationModel;
-use App\Models\DepartmentModel;
-use App\Models\AreaModel;
+use App\Controllers\HelperUtility;
 
+/**
+ * Gestión de USUARIOS: cuentas que inician sesión en la intranet.
+ *
+ * Los viewers (rol `user`) normalmente los crea Nexus vía API; admin/operator
+ * se dan de alta aquí manualmente. Este controlador también expone el perfil
+ * de la cuenta con sesión iniciada.
+ */
 class User extends BaseController
 {
     protected $userModel;
     protected $lang;
-    protected $ocupationModel;
-    protected $departmentModel;
-    protected $areaModel;
-    protected $session;
 
     public function __construct()
     {
-        $this->lang             = \Config\Services::language();
-        $this->lang             ->setLocale('es');
-        $this->userModel        = new UserModel();
-        $this->ocupationModel   = new OcupationModel();
-        $this->departmentModel  = new DepartmentModel();
-        $this->areaModel        = new AreaModel();
+        $this->lang      = \Config\Services::language();
+        $this->lang      ->setLocale('es');
+        $this->userModel = new UserModel();
     }
-    
+
+    /* ------------------------------------------------------------------ */
+    /*  Sección Usuarios (cuentas de login)                                */
+    /* ------------------------------------------------------------------ */
+
     public function index(): string
     {
-        $users   = $this->userModel->getUsers();
-        return   view('shared/header',                  ['title'        => 'Usuarios'])
+        $users = $this->userModel->getUsers();
+        return   view('shared/header',                      ['title' => 'Usuarios'])
                 .view('shared/sidebar')
                 .view('shared/navbar')
-                .view('pages/admin/user/user',          ['users'        => $users])
+                .view('pages/admin/user-account/index',     ['users' => $users])
                 .view('shared/footer');
     }
-   
+
     public function newUser(): string
     {
-        return   view('shared/header',                  ['title'        => 'Nuevo usuario'])
+        return   view('shared/header',                      ['title' => 'Nuevo usuario'])
                 .view('shared/sidebar')
                 .view('shared/navbar')
-                .view('pages/admin/user/user-new',      [ 
-                                                            'ocupations'   => $this->ocupationModel->getOcupations(),
-                                                            'users'        => $this->userModel->getUsers(),
-                                                            'departments'  => $this->departmentModel->getDepartments(),
-                                                            'areas'        => $this->areaModel->getAreas(),
-                                                            'csrfName'     => csrf_token(),
-                                                            'csrfHash'     => csrf_hash()
-                                                        ])
+                .view('pages/admin/user-account/create',    [
+                                                                'csrfName' => csrf_token(),
+                                                                'csrfHash' => csrf_hash(),
+                                                            ])
                 .view('shared/footer');
     }
-   
+
     public function editUser($id)
     {
-        $data['csrfName']   = csrf_token();
-        $data['csrfHash']   = csrf_hash();
-        $data['user']       = $this->userModel->getUsers($id);
-        $data['users']      = $this->userModel->getUsers();
-        $data['ocupations'] = $this->ocupationModel->getOcupations();
-        $data['departments'] = $this->departmentModel->getDepartments();
-        $data['areas']      = $this->areaModel->getAreas();
-        
-        if ($data['user']) {
-            return   
-                view('shared/header',                       ['title'        => "Editar usuario"])
-               .view('shared/sidebar')
-               .view('shared/navbar')
-               .view('pages/admin/user/user-edit',          ['data'        => $data])
-               .view('shared/footer');
-        } else {
-            return redirect()->to('/user');
+        $user = $this->userModel->getUsers($id);
+
+        if (!$user) {
+            return redirect()->to('/usuarios');
         }
+
+        return   view('shared/header',                      ['title' => 'Editar usuario'])
+                .view('shared/sidebar')
+                .view('shared/navbar')
+                .view('pages/admin/user-account/edit',      [
+                                                                'user'     => $user,
+                                                                'csrfName' => csrf_token(),
+                                                                'csrfHash' => csrf_hash(),
+                                                            ])
+                .view('shared/footer');
     }
+
+    public function create()
+    {
+        $name     = $this->request->getPost('name');
+        $lastname = $this->request->getPost('lastname');
+        $email    = $this->request->getPost('email');
+        $password = $this->request->getPost('password');
+        $rol      = $this->request->getPost('rol');
+
+        if (!$this->checkEmptyField([$name, $email, $password, $rol])) {
+            return HelperUtility::redirectWithMessage('/usuarios/new', lang('Errors.missing_fields'));
+        }
+
+        if ($this->userModel->getUserByEmail($email)) {
+            return HelperUtility::redirectWithMessage('/usuarios/new', lang('Errors.auth_email_exist'));
+        }
+
+        $created = $this->userModel->createUser([
+            'name'     => $name,
+            'lastname' => $lastname,
+            'email'    => $email,
+            'password' => password_hash($password, PASSWORD_BCRYPT),
+            'rol'      => $rol,
+            'active'   => 1,
+        ]);
+
+        if ($created) {
+            return HelperUtility::redirectWithMessage('/usuarios', lang('Success.user_created'), 'success');
+        }
+
+        return HelperUtility::redirectWithMessage('/usuarios/new', lang('Errors.error_try_again_later'));
+    }
+
+    public function update()
+    {
+        $id       = $this->request->getPost('id');
+        $name     = $this->request->getPost('name');
+        $lastname = $this->request->getPost('lastname');
+        $email    = $this->request->getPost('email');
+        $password = $this->request->getPost('password');
+        $rol      = $this->request->getPost('rol');
+
+        if (!$this->checkEmptyField([$id, $name, $email, $rol])) {
+            return HelperUtility::redirectWithMessage("/usuarios/edit/$id", lang('Errors.missing_fields'));
+        }
+
+        $actual = $this->userModel->getUsers($id);
+        if (!$actual) {
+            return HelperUtility::redirectWithMessage('/usuarios', lang('Errors.user_not_found'));
+        }
+
+        if (trim($email) !== trim($actual->email) && $this->userModel->getUserByEmail($email)) {
+            return HelperUtility::redirectWithMessage("/usuarios/edit/$id", lang('Errors.auth_email_exist'));
+        }
+
+        $data = [
+            'name'     => $name,
+            'lastname' => $lastname,
+            'email'    => $email,
+            'rol'      => $rol,
+        ];
+
+        if (!empty($password)) {
+            $data['password'] = password_hash($password, PASSWORD_BCRYPT);
+        }
+
+        if ($this->userModel->update($id, $data)) {
+            return HelperUtility::redirectWithMessage("/usuarios/edit/$id", lang('Success.user_updated'), 'success');
+        }
+
+        return HelperUtility::redirectWithMessage("/usuarios/edit/$id", lang('Errors.error_try_again_later'));
+    }
+
+    public function activeUser()
+    {
+        $id = $this->request->getPost('id');
+        return $this->respondWithCsrf([
+            'ok' => $this->userModel->activeUser($id),
+        ]);
+    }
+
+    public function inactiveUser()
+    {
+        $current = $this->session->get('user');
+        $id      = $this->request->getPost('id');
+
+        if ($id == $current->id) {
+            return $this->respondWithCsrf([
+                'ok'    => false,
+                'error' => lang('Errors.auth_inactive_samne_account'),
+            ]);
+        }
+
+        return $this->respondWithCsrf([
+            'ok' => $this->userModel->inactiveUser($id),
+        ]);
+    }
+
+    /* ------------------------------------------------------------------ */
+    /*  Perfil de la cuenta con sesión iniciada                            */
+    /* ------------------------------------------------------------------ */
 
     public function profile(): string
     {
-        $users   = $this->userModel->getUsers();
-        return   view('shared/header',                     ['title'        => 'Mi perfil'])
+        return   view('shared/header',                     ['title' => 'Mi perfil'])
                 .view('shared/sidebar')
                 .view('shared/navbar')
                 .view('pages/shared/profile/profile-home', [
-                                                                'user'         => $this->userModel->getUsers(session('user')->id),
-                                                                'csrfName'     => csrf_token(),
-                                                                'csrfHash'     => csrf_hash(),
+                                                                'user'     => $this->userModel->getUsers(session('user')->id),
+                                                                'csrfName' => csrf_token(),
+                                                                'csrfHash' => csrf_hash(),
                                                             ])
                 .view('shared/footer');
     }
 
     public function updatePassword()
     {
+        $oldPassword           = $this->request->getPost('oldPassword');
+        $password              = $this->request->getPost('password');
+        $password_confirmation = $this->request->getPost('password_confirmation');
+        $user                  = $this->userModel->getUsers(session('user')->id);
 
-        // Obtenemos variables
-        $oldPassword                = $this->request->getPost('oldPassword');
-        $password                   = $this->request->getPost('password');
-        $password_confirmation      = $this->request->getPost('password_confirmation');
-        $user                       = $this->userModel->getUsers(session('user')->id);
-
-        // Verificamos que la contraseña actual no sea vacía y tenga mas de 6 caracteres
         if (empty($password) || strlen($password) < 6) {
             return $this->respondWithCsrf([
-                'ok'            => false,
-                'error'         => lang('Errors.auth_invalid_password_format'),
+                'ok'    => false,
+                'error' => lang('Errors.auth_invalid_password_format'),
             ]);
         }
 
-        // Verificamos si la contraseña actual es correcta
-        if (!password_verify($oldPassword, $user->password)){
+        if (!password_verify($oldPassword, $user->password)) {
             return $this->respondWithCsrf([
-                'ok'            => false,
-                'error'         => lang('Errors.auth_invalid_credentials'),
+                'ok'    => false,
+                'error' => lang('Errors.auth_invalid_credentials'),
             ]);
         }
 
-        // Verificamos si las contraseñas coinciden
         if ($password !== $password_confirmation) {
             return $this->respondWithCsrf([
-                'ok'            => false,
-                'error'         => lang('Errors.auth_password_not_match'),
+                'ok'    => false,
+                'error' => lang('Errors.auth_password_not_match'),
             ]);
         }
 
-        // Actualizamos la contraseña hasheada
         $this->userModel->setNewPassword(session('user')->id, password_hash($password, PASSWORD_BCRYPT));
-
-        // Actualizamos la sesión
         $this->refreshSession();
 
-        // Respondemos
         return $this->respondWithCsrf([
-            'ok'            => true,
-            'message'       => lang('Success.auth_password_updated'),
+            'ok'      => true,
+            'message' => lang('Success.auth_password_updated'),
         ]);
     }
 
     public function updateProfile()
     {
-        $id             = session('user')->id;                          // Mandatory    
-        $name           = $this->request->getPost('name');              // Mandatory
-        $lastname       = $this->request->getPost('lastname');          // Mandatory
-        $cellphone      = $this->request->getPost('cellphone');         // Mandatory
-        $telephone      = $this->request->getPost('telephone');         // Optional
-        $ext            = $this->request->getPost('ext');               // Optional
+        $id       = session('user')->id;
+        $name     = $this->request->getPost('name');
+        $lastname = $this->request->getPost('lastname');
 
-        // Validar que los campos no esten vacios
-        if(!$this->checkEmptyField([ $name, $lastname, $cellphone])){
+        if (!$this->checkEmptyField([$name])) {
             return $this->respondWithCsrf([
-                'ok'     => false,
-                'error'  => lang('Errors.missing_fields'),
+                'ok'    => false,
+                'error' => lang('Errors.missing_fields'),
             ]);
         }
 
-        // Actualizar usuario en la base de datos
-        if($this->userModel->updateProfile($id, $name, $lastname, $telephone, $cellphone, $ext)){
-
-            // Actualizar la sesión
+        if ($this->userModel->updateProfile($id, $name, $lastname)) {
             $this->refreshSession();
-
-            // Respondemos
             return $this->respondWithCsrf([
-                'ok'            => true,
-                'message'       => lang('Success.auth_profile_updated'),
+                'ok'      => true,
+                'message' => lang('Success.auth_profile_updated'),
             ]);
         }
 
-        
-
+        return $this->respondWithCsrf([
+            'ok'      => false,
+            'message' => lang('Errors.error_try_again_later'),
+        ]);
     }
 
     public function updatePhoto()
     {
-        // Obtenemos la imagen
         $photo = $this->request->getFile('photo');
 
-        // Verificamos si la imagen es válida
         if ($photo && $photo->isValid() && !$photo->hasMoved()) {
 
-            // Obtenemos usuario
             $actualUser = $this->userModel->getUsers(session('user')->id);
 
-            // Subir la imagen
-            if (!$this->handlePhotoUpload($photo)) {
-
-                // En caso de error
+            if (!in_array($photo->getClientMimeType(), ['image/jpeg', 'image/png', 'image/jpg'])) {
                 return $this->respondWithCsrf([
-                    'ok'            => false,
-                    'message'       => lang('Errors.gral_upload_file_error'),
+                    'ok'      => false,
+                    'message' => lang('Errors.gral_upload_file_error'),
                 ]);
             }
 
-            if($actualUser->photo != 'assets/images/anonimo.jpg'){
-                // Eliminar la imagen anterior
-                if (file_exists(ROOTPATH . 'public/' . $actualUser->photo)) {
-                    unlink(ROOTPATH . 'public/' . $actualUser->photo);
-                }
+            $uploadPath = ROOTPATH . 'public/uploads/images/profiles';
+            if (!is_dir($uploadPath)) {
+                mkdir($uploadPath, 0755, true);
             }
 
-            // Crear nuevo nombre
-            $newName    = $photo->getName();
-            $newImage   = 'uploads/images/profiles/' . $newName;
+            $newName = $photo->getRandomName();
+            $photo->move($uploadPath, $newName);
+            $newImage = 'uploads/images/profiles/' . $newName;
 
-            // Actualizar usuario en la base de datos
-            if($this->userModel->setNewPhoto(session('user')->id, $newImage)){
+            if ($actualUser->photo != 'assets/images/anonimo.jpg' && file_exists(ROOTPATH . 'public/' . $actualUser->photo)) {
+                unlink(ROOTPATH . 'public/' . $actualUser->photo);
+            }
 
-                // Actualizar la sesión
+            if ($this->userModel->setNewPhoto(session('user')->id, $newImage)) {
                 $this->refreshSession();
-
-                // Respondemos
                 return $this->respondWithCsrf([
-                    'ok'            => true,
-                    'message'       => lang('Success.auth_photo_updated'),
+                    'ok'      => true,
+                    'message' => lang('Success.auth_photo_updated'),
                 ]);
             }
 
-            // En caso de error
             return $this->respondWithCsrf([
-                'ok'            => false,
-                'message'       => lang('Errors.error_try_again_later'),
-            ]);
-
-        }else{
-
-            // Respondemos
-            return $this->respondWithCsrf([
-                'ok'            => false,
-                'message'       => lang('Errors.auth_invalid_image'),
-            ]);
-        }
-    }
-
-    public function reingresarUsuario()
-    {
-        $id         = $this->request->getPost('id');
-        $date_entry = $this->request->getPost('date_entry');
-
-        // Validar que los campos no esten vacios
-        if(!$this->checkEmptyField([ $id, $date_entry ])){
-            return $this->respondWithCsrf([
-                'ok'     => false,
-                'error'  => lang('Errors.missing_fields'),
-            ]); 
-        }
-
-        // Actualizar usuario en la base de datos
-        if($this->userModel->reingresarUsuario($id, $date_entry)){
-
-            // Reingresar usuario ghost si existe
-            $actualUser = $this->userModel->getUsers($id);
-            if($actualUser->has_ghost != null){
-                $this->userModel->reingresarUsuario($actualUser->has_ghost, $date_entry); 
-            }
-
-            return $this->respondWithCsrf([
-                'ok'            => true,
-                'message'       => lang('Success.user_reingreso_success'),
+                'ok'      => false,
+                'message' => lang('Errors.error_try_again_later'),
             ]);
         }
 
-        // En caso de error
         return $this->respondWithCsrf([
-            'ok'            => false,
-            'message'       => lang('Errors.error_try_again_later'),
+            'ok'      => false,
+            'message' => lang('Errors.auth_invalid_image'),
         ]);
-    }
-
-    private function handlePhotoUpload($photo) : bool
-    {
-        if ($photo && $photo->isValid() && !$photo->hasMoved()) {
-
-            if (in_array($photo->getClientMimeType(), ['image/jpeg', 'image/png'])) {
-
-                $uploadPath = ROOTPATH . 'public/uploads/images/profiles';
-
-                if (!is_dir($uploadPath)) {
-                    mkdir($uploadPath, 0755, true);
-                }
-
-                $newName = $photo->getRandomName();
-                $photo->move($uploadPath, $newName);
-
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-
-            return false;
-        }
     }
 
     private function refreshSession()

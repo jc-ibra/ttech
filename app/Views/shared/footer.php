@@ -6,10 +6,10 @@
     <script src="<?= base_url('assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js') ?>"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
-    <?php if (strpos(uri_string(), 'directorio') !== false || strpos(uri_string(), 'ocupation') !== false || strpos(uri_string(), 'department') !== false || strpos(uri_string(), 'area') !== false || strpos(uri_string(), 'custom-organigram') !== false): ?>
+    <?php if (strpos(uri_string(), 'directorio') !== false || strpos(uri_string(), 'ocupation') !== false || strpos(uri_string(), 'department') !== false || strpos(uri_string(), 'area') !== false || strpos(uri_string(), 'custom-organigram') !== false || strpos(uri_string(), 'empleados') !== false || strpos(uri_string(), 'usuarios') !== false): ?>
       <!-- Datatable -->
       <script src="//cdn.datatables.net/2.1.7/js/dataTables.min.js"></script>
-    <?php endif; ?>  
+    <?php endif; ?>
 
 
     <script src="<?= base_url('assets/js/sidebarmenu.js') ?>"></script>
@@ -21,7 +21,7 @@
     <script src="<?= base_url('assets/js/files.js') ?>"></script>
   <?php endif; ?>  
 
-  <?php if (strpos(uri_string(), 'user/new') !== false || strpos(uri_string(), 'user/edit') !== false || strpos(uri_string(), 'organization') !== false || strpos(uri_string(), 'custom-organigram') !== false): ?>
+  <?php if (strpos(uri_string(), 'empleados/new') !== false || strpos(uri_string(), 'empleados/edit') !== false || strpos(uri_string(), 'organization') !== false || strpos(uri_string(), 'custom-organigram') !== false): ?>
     <!-- Select2 -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -32,8 +32,8 @@
     <script src="<?= base_url('assets/js/alerts.js') ?>"></script>
   <?php endif; ?>
   
-  <?php if (strpos(uri_string(), 'user/new') !== false): ?>
-    <!-- Usuario -->
+  <?php if (strpos(uri_string(), 'empleados/new') !== false): ?>
+    <!-- Empleado -->
     <script src="<?= base_url('assets/js/user.js') ?>"></script>
   <?php endif; ?>
 
@@ -42,8 +42,8 @@
     <script src="<?= base_url('assets/js/directorio.js') ?>"></script>
   <?php endif; ?>
 
-  <?php if (strpos(uri_string(), 'user/edit') !== false): ?>
-    <!-- Usuario -->
+  <?php if (strpos(uri_string(), 'empleados/edit') !== false): ?>
+    <!-- Empleado -->
     <script src="<?= base_url('assets/js/user-edit.js') ?>"></script>
   <?php endif; ?>
   

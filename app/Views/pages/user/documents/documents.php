@@ -1,18 +1,39 @@
 <div class="container-fluid mw-1600">
-  <div class="card documents__wrapper">
+  <div class="card documents__wrapper doc-card">
     <div class="card-body">
-      <h5 class="card-title fw-semibold mb-4">Documentos</h5>
-      <div class="row">
-        <div class="col-lg-3 col-md-4 mb-4 mb-md-0">
-          <div id="folderTree"></div>
+
+      <div class="doc-head">
+        <div>
+          <h5 class="doc-head__title"><i class="ti ti-folders"></i> Documentos</h5>
+          <p class="doc-head__sub">Explora las carpetas y consulta los archivos disponibles.</p>
         </div>
+      </div>
+
+      <div class="row g-4">
+        <!-- Árbol de carpetas -->
+        <div class="col-lg-4 col-md-5">
+          <div class="doc-tree">
+            <div class="doc-tree__label"><i class="ti ti-sitemap"></i> Carpetas</div>
+            <div id="folderTree"></div>
+          </div>
+        </div>
+
+        <!-- Contenido de la carpeta -->
         <div class="col">
-          <div class="d-flex align-items-center justify-content-between align-items-center mb-3">
-            <h5 class="card-title fw-semibold m-0" id="title__documents"></h5>
-          </div>  
-          <div id="documents__container" class="mt-2">
-            <ul id="document__list__container">              
-            </ul>
+          <div class="doc-panel">
+            <div class="doc-panel__head">
+              <h5 class="doc-panel__title" id="title__documents"></h5>
+              <span class="doc-panel__count" id="doc__count" style="display:none;"></span>
+            </div>
+            <div id="documents__container">
+              <ul id="document__list__container">
+                <li class="doc-placeholder">
+                  <div class="doc-placeholder__icon"><i class="ti ti-folder-open"></i></div>
+                  <h6>Selecciona una carpeta</h6>
+                  <p>Elige una carpeta del árbol para ver los documentos que contiene.</p>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>

@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Models\UserModel;
+use App\Models\EmployeeModel;
 use App\Models\DepartmentModel;
 use App\Models\AreaModel;
 use App\Models\CustomOrganigramModel;
@@ -19,7 +19,7 @@ class Organization extends BaseController
 
     public function __construct()
     {
-        $this->userModel              = new UserModel();
+        $this->userModel              = new EmployeeModel();
         $this->departmentModel        = new DepartmentModel();
         $this->areaModel              = new AreaModel();
         $this->customOrganigram       = new CustomOrganigram();
@@ -31,6 +31,7 @@ class Organization extends BaseController
         
         return   view('shared/header',                              ['title'        => 'Organigrama'])
                 .view('shared/sidebar')
+                .view('shared/navbar')
                 .view('pages/admin/organization/organization',      [
                                                                         'departments'          => $this->departmentModel->getDepartments(),
                                                                         'areas'                => $this->areaModel->getAreas(),
