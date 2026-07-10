@@ -1,3 +1,4 @@
+<?php $isNexus = !empty($user->nexus_id); ?>
 <div class="container-fluid mw-1600">
   <div class="card">
     <div class="card-body p-4">
@@ -11,6 +12,13 @@
         </a>
       </div>
 
+      <?php if ($isNexus): ?>
+        <div class="alert alert-info d-flex align-items-center mb-3">
+          <i class="ti ti-info-circle me-2"></i>
+          <span>Este usuario proviene de <strong>Nexus</strong> y se gestiona de forma centralizada. Sus datos son de <strong>solo lectura</strong> y no pueden modificarse desde la intranet.</span>
+        </div>
+      <?php endif; ?>
+
       <form method="post" action="<?= base_url('usuarios/update') ?>">
         <?php echo csrf_field(); ?>
         <input type="hidden" id="id" name="id" value="<?= $user->id ?>">
@@ -19,13 +27,13 @@
           <div class="col-md-6 col-lg-4">
             <div class="mb-3">
               <label class="form-label" for="name">Nombre(s) <span class="field-required">*</span></label>
-              <input type="text" id="name" name="name" value="<?= esc($user->name) ?>" class="form-control" required>
+              <input type="text" id="name" name="name" value="<?= esc($user->name) ?>" class="form-control" required <?= $isNexus ? 'disabled' : '' ?>>
             </div>
           </div>
           <div class="col-md-6 col-lg-4">
             <div class="mb-3">
               <label class="form-label" for="lastname">Apellidos</label>
-              <input type="text" id="lastname" name="lastname" value="<?= esc($user->lastname) ?>" class="form-control">
+              <input type="text" id="lastname" name="lastname" value="<?= esc($user->lastname) ?>" class="form-control" <?= $isNexus ? 'disabled' : '' ?>>
             </div>
           </div>
           <div class="col-md-6 col-lg-4">
@@ -33,26 +41,28 @@
               <label class="form-label" for="email">E-mail <span class="field-required">*</span></label>
               <div class="input-group">
                 <span class="input-group-text"><i class="ti ti-mail"></i></span>
-                <input type="email" id="email" name="email" value="<?= esc($user->email) ?>" class="form-control" required>
+                <input type="email" id="email" name="email" value="<?= esc($user->email) ?>" class="form-control" required <?= $isNexus ? 'disabled' : '' ?>>
               </div>
             </div>
           </div>
           <div class="col-md-6 col-lg-4">
             <div class="mb-3">
               <label class="form-label">Rol <span class="field-required">*</span></label>
-              <select class="form-select" name="rol" required>
+              <select class="form-select" name="rol" required <?= $isNexus ? 'disabled' : '' ?>>
                 <option value="user" <?= $user->rol == 'user' ? 'selected' : '' ?>>Usuario</option>
                 <option value="operator" <?= $user->rol == 'operator' ? 'selected' : '' ?>>Operador</option>
                 <option value="admin" <?= $user->rol == 'admin' ? 'selected' : '' ?>>Administrador</option>
               </select>
             </div>
           </div>
+          <?php if (!$isNexus): ?>
           <div class="col-md-6 col-lg-4">
             <div class="mb-3">
               <label class="form-label" for="password">Restablecer contraseña</label>
               <input type="password" id="password" name="password" class="form-control" placeholder="Dejar en blanco para no cambiar">
             </div>
           </div>
+          <?php endif; ?>
           <?php if (!empty($user->nexus_id)): ?>
           <div class="col-md-6 col-lg-4">
             <div class="mb-3">
@@ -71,6 +81,7 @@
           <div class="alert alert-success mb-3"><?= session('success'); ?></div>
         <?php endif; ?>
 
+        <?php if (!$isNexus): ?>
         <div class="form-actions">
           <button type="submit" class="btn btn-primary" id="account_save">Actualizar usuario</button>
           <?php if ($user->active == 1): ?>
@@ -79,6 +90,7 @@
             <button type="button" class="btn btn-outline-secondary" id="active_user">Activar</button>
           <?php endif; ?>
         </div>
+        <?php endif; ?>
       </form>
     </div>
   </div>

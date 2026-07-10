@@ -119,6 +119,12 @@ class User extends BaseController
             return HelperUtility::redirectWithMessage('/usuarios', lang('Errors.user_not_found'));
         }
 
+        // Los usuarios de origen Nexus se gestionan de forma centralizada en Nexus.
+        // La intranet no puede modificar sus datos: son de solo lectura.
+        if (!empty($actual->nexus_id)) {
+            return HelperUtility::redirectWithMessage("/usuarios/edit/$id", lang('Errors.user_nexus_readonly'));
+        }
+
         if (trim($email) !== trim($actual->email) && $this->userModel->getUserByEmail($email)) {
             return HelperUtility::redirectWithMessage("/usuarios/edit/$id", lang('Errors.auth_email_exist'));
         }
@@ -144,6 +150,14 @@ class User extends BaseController
     public function activeUser()
     {
         $id = $this->request->getPost('id');
+
+        if ($this->isNexusUser($id)) {
+            return $this->respondWithCsrf([
+                'ok'    => false,
+                'error' => lang('Errors.user_nexus_readonly'),
+            ]);
+        }
+
         return $this->respondWithCsrf([
             'ok' => $this->userModel->activeUser($id),
         ]);
@@ -161,9 +175,26 @@ class User extends BaseController
             ]);
         }
 
+        if ($this->isNexusUser($id)) {
+            return $this->respondWithCsrf([
+                'ok'    => false,
+                'error' => lang('Errors.user_nexus_readonly'),
+            ]);
+        }
+
         return $this->respondWithCsrf([
             'ok' => $this->userModel->inactiveUser($id),
         ]);
+    }
+
+    /**
+     * ¿La cuenta proviene de Nexus? De ser así, es de solo lectura en la
+     * intranet (se gestiona de forma centralizada en Nexus).
+     */
+    private function isNexusUser($id): bool
+    {
+        $user = $this->userModel->getUsers($id);
+        return $user && !empty($user->nexus_id);
     }
 
     /* ------------------------------------------------------------------ */

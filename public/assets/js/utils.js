@@ -1,5 +1,11 @@
 function showMessage(alertClass, message) {
 
+  // Fallback: si no llega un mensaje (p. ej. una respuesta de error sin texto),
+  // evitamos el texto por defecto de Toastify ("Toastify is awesome!").
+  if (!message) {
+    message = 'Se produjo un error, consulta con tu administrador.';
+  }
+
   var style = {  background: "linear-gradient(to right, #1771C8,rgb(121, 190, 255))" };
   
   if(alertClass === 'alert-info'){

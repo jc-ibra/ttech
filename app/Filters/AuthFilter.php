@@ -5,6 +5,7 @@ namespace App\Filters;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\Filters\FilterInterface;
+use App\Models\UserModel;
 
 class AuthFilter implements FilterInterface
 {
@@ -14,6 +15,16 @@ class AuthFilter implements FilterInterface
         // Si no está autenticado, redirigir al login
         if (!session('user')) {
             return redirect()->to('/')->with('message', 'Por favor inicia sesión');
+        }
+
+        // Verificar en cada petición que la cuenta siga activa en la BD.
+        // Si fue desactivada (o eliminada) mientras la sesión estaba abierta,
+        // se cierra la sesión de inmediato sin esperar a un nuevo login.
+        $currentUser = (new UserModel())->find(session('user')->id);
+
+        if (!$currentUser || (int) $currentUser->active !== 1) {
+            session()->destroy();
+            return redirect()->to('/')->with('message', 'Tu cuenta ha sido desactivada.');
         }
 
         // Si no tiene permisos, redirigir a 404

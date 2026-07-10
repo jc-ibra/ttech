@@ -11,6 +11,7 @@ return [
     'user_or_project_not_found'     => 'Usuario o proyecto no encontrado',
     'user_or_repository_not_found'  => 'Usuario o repositorio no encontrado',
     'user_required_at_least_one'    => 'Se requiere al menos un usuario',
+    'user_nexus_readonly'           => 'Este usuario proviene de Nexus y se gestiona de forma centralizada. No se puede modificar desde la intranet.',
 
     'auth_password_not_match'       => 'Las contraseñas no coinciden',
     'auth_email_exist'              => 'Este correo electrónico ya existe',
