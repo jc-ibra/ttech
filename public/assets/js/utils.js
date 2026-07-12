@@ -56,7 +56,17 @@ $(document).on('click', '.removeItem', function() {
     if (deleteItem) {
         $.post(deleteURL, { id: itemId, [csrfName]: csrfHash }, handleResponse)
           .fail(() => showMessage('alert-danger', 'Error en la solicitud.'))
-          .done(() => { $(this).closest('tr').remove(); });
+          .done(() => {
+              let tr = $(this).closest('tr');
+              let tableEl = tr.closest('table')[0];
+              // Si la fila vive dentro de un DataTable, hay que quitarla vía API
+              // para que no reaparezca al ordenar/buscar/paginar.
+              if (tableEl && $.fn.DataTable && $.fn.DataTable.isDataTable(tableEl)) {
+                  $(tableEl).DataTable().row(tr).remove().draw(false);
+              } else {
+                  tr.remove();
+              }
+          });
 
     }
 });

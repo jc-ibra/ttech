@@ -14,7 +14,7 @@
         </a>
       </div>
       <div class="table-responsive">
-        <table class="table table-hover align-middle" id="dt_table">
+        <table class="table table-hover align-middle w-100 js-datatable" id="dt_table" data-order-col="1" data-order-dir="asc" data-no-export="true">
           <thead>
             <tr>
               <th>Id</th>

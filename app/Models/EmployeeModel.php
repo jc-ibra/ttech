@@ -52,6 +52,110 @@ class EmployeeModel extends Model{
         return $this->orderBy('created_at', 'DESC')->findAll();
     }
 
+    /**
+     * Construye el builder base para el listado de empleados (server-side DataTables).
+     * Aplica joins, excluye ghosts y soft-deletes, y aplica filtros + búsqueda global.
+     * Se crea un builder nuevo en cada llamada para poder reutilizarlo en conteos y datos.
+     *
+     * @param array $p Filtros: department, area, ocupation, status, search
+     */
+    private function dataTableBuilder(array $p)
+    {
+        $builder = $this->db->table('employees');
+
+        $builder->join('ocupations', 'ocupations.id = employees.ocupation', 'left')
+                ->join('employees as parent', 'parent.id = employees.parent', 'left')
+                ->join('departments', 'departments.id = employees.department', 'left')
+                ->join('areas', 'areas.id = employees.area', 'left');
+
+        // Excluir soft-deleted y nodos "ghost" (no representan empleados reales).
+        $builder->where('employees.deleted_at', null)
+                ->groupStart()
+                    ->where('employees.ghost', null)
+                    ->orWhere('employees.ghost', 0)
+                ->groupEnd();
+
+        // Filtros
+        if (!empty($p['department'])) {
+            $builder->where('employees.department', $p['department']);
+        }
+        if (!empty($p['area'])) {
+            $builder->where('employees.area', $p['area']);
+        }
+        if (!empty($p['ocupation'])) {
+            $builder->where('employees.ocupation', $p['ocupation']);
+        }
+        if (isset($p['status']) && $p['status'] !== '' && $p['status'] !== null) {
+            $builder->where('employees.active', (int) $p['status']);
+        }
+
+        // Búsqueda global
+        if (!empty($p['search'])) {
+            $s = $p['search'];
+            $builder->groupStart()
+                    ->like('employees.name', $s)
+                    ->orLike('employees.lastname', $s)
+                    ->orLike('employees.email', $s)
+                    ->orLike('employees.employee_number', $s)
+                    ->orLike('ocupations.name', $s)
+                    ->orLike('departments.name', $s)
+                    ->orLike('areas.name', $s)
+                    ->groupEnd();
+        }
+
+        return $builder;
+    }
+
+    /**
+     * Página de empleados para DataTables server-side.
+     */
+    public function getDataTable(array $p): array
+    {
+        $builder = $this->dataTableBuilder($p);
+
+        $builder->select('employees.id, employees.name, employees.lastname, employees.email, employees.employee_number, employees.active, employees.photo, ocupations.name as ocupation_name, departments.name as department_name, areas.name as area_name, CONCAT(parent.name, " ", parent.lastname) as parent_name');
+
+        // Mapeo índice de columna DataTables -> campo SQL para ordenar.
+        $orderable = [
+            0 => 'employees.name',
+            1 => 'employees.employee_number',
+            2 => 'employees.email',
+            3 => 'ocupations.name',
+            4 => 'departments.name',
+            5 => 'areas.name',
+            6 => 'parent.name',
+            7 => 'employees.active',
+        ];
+
+        $orderField = $orderable[$p['orderColumn'] ?? 0] ?? 'employees.name';
+        $orderDir   = strtolower($p['orderDir'] ?? 'asc') === 'desc' ? 'DESC' : 'ASC';
+        $builder->orderBy($orderField, $orderDir);
+
+        $length = (int) ($p['length'] ?? 25);
+        $start  = (int) ($p['start'] ?? 0);
+        if ($length > 0) {
+            $builder->limit($length, $start);
+        }
+
+        return $builder->get()->getResult();
+    }
+
+    /**
+     * Total de empleados que cumplen los filtros/búsqueda (recordsFiltered).
+     */
+    public function countDataTable(array $p): int
+    {
+        return $this->dataTableBuilder($p)->countAllResults();
+    }
+
+    /**
+     * Total de empleados reales sin filtros (recordsTotal).
+     */
+    public function countDataTableTotal(): int
+    {
+        return $this->dataTableBuilder([])->countAllResults();
+    }
+
     public function createUser($name, $lastname, $email, $password, $photo, $telephone, $rol, $ocupation, $department, $parent, $email_secondary, $cellphone, $ext, $date_entry, $employee_number, $hide_emails, $show_in_directory, $ghost, $has_ghost, $real_parent, $niveles, $area)
     {
         $data = [

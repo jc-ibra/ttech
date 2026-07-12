@@ -13,37 +13,22 @@
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
   <link rel="stylesheet" href="<?= base_url('assets/css/styles.min.css') ?>" />
 
-<?php if (strpos(uri_string(), 'directorio') !== false || strpos(uri_string(), 'ocupation') !== false || strpos(uri_string(), 'department') !== false || strpos(uri_string(), 'area') !== false || strpos(uri_string(), 'custom-organigram') !== false): ?>
-  <!-- Datatable -->
+<?php
+  // Rutas que usan tablas del administrador (DataTables + extensión Buttons).
+  $adminTableRoutes = ['directorio', 'ocupation', 'department', 'area', 'custom-organigram', 'empleados', 'usuarios'];
+  $isAdminTable = false;
+  foreach ($adminTableRoutes as $r) {
+    if (strpos(uri_string(), $r) !== false) { $isAdminTable = true; break; }
+  }
+?>
+<?php if ($isAdminTable): ?>
+  <!-- DataTables (núcleo + Buttons) - CSS -->
   <link rel="stylesheet" href="//cdn.datatables.net/2.1.7/css/dataTables.dataTables.min.css">
-<?php endif; ?>  
+  <link rel="stylesheet" href="//cdn.datatables.net/buttons/3.1.2/css/buttons.dataTables.min.css">
+<?php endif; ?>
 
   <!-- jQuery -->
   <script src="<?= base_url('assets/libs/jquery/dist/jquery.min.js') ?>"></script>
-
-  <?php if ( strpos(uri_string(), 'user' ) !== false  ): ?>
-    <!-- Datatable User -->
-
-    <!-- DataTables núcleo -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" />
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-
-    <!-- Extensión Buttons -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
-
-    <!-- Botón de Column Visibility -->
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.colVis.min.js"></script>
-
-
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.colVis.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-
-    
-  <?php endif; ?>  
 
 
 <?php if ( strpos(uri_string(), 'documentos' ) !== false || strpos(uri_string(), 'documents' ) !== false ): ?>

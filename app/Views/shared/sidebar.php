@@ -95,6 +95,10 @@
           <span class="ntx-ico"><i class="ti ti-file-analytics"></i></span>
           <span class="ntx-label">Gestión docs</span>
         </a>
+        <a class="ntx-link<?= $act('landing') ?>" href="<?= base_url('landing') ?>">
+          <span class="ntx-ico"><i class="ti ti-world-www"></i></span>
+          <span class="ntx-label">Contenido T. Tech</span>
+        </a>
         <a class="ntx-link<?= $act('suggestions') ?>" href="<?= base_url('suggestions') ?>">
           <span class="ntx-ico"><i class="ti ti-mail-opened"></i></span>
           <span class="ntx-label">Buzón (admin)</span>

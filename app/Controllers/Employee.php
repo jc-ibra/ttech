@@ -33,12 +33,127 @@ class Employee extends BaseController
 
     public function index(): string
     {
-        $users   = $this->employeeModel->getUsers();
+        // El listado se carga vía AJAX (server-side). Aquí sólo pasamos los
+        // catálogos que alimentan los filtros de la tabla.
         return   view('shared/header',                  ['title'        => 'Empleados'])
                 .view('shared/sidebar')
                 .view('shared/navbar')
-                .view('pages/admin/user/user',          ['users'        => $users])
+                .view('pages/admin/user/user',          [
+                                                            'departments' => $this->departmentModel->getDepartments(),
+                                                            'areas'       => $this->areaModel->getAreas(),
+                                                            'ocupations'  => $this->ocupationModel->getOcupations(),
+                                                        ])
                 .view('shared/footer');
+    }
+
+    /**
+     * Endpoint server-side de DataTables para el listado de empleados.
+     * Devuelve JSON con paginación, búsqueda, orden y filtros resueltos en SQL.
+     */
+    public function datatable()
+    {
+        $params = $this->dataTableParams();
+
+        $draw          = (int) $this->request->getGet('draw');
+        $recordsTotal  = $this->employeeModel->countDataTableTotal();
+        $recordsFiltered = $this->employeeModel->countDataTable($params);
+        $employees     = $this->employeeModel->getDataTable($params);
+
+        $data = [];
+        foreach ($employees as $e) {
+            $editUrl = base_url('empleados/edit/' . $e->id);
+            $photo   = base_url($e->photo);
+            $status  = $e->active == 1
+                ? '<span class="badge-success">Activo</span>'
+                : '<span class="badge-critical">Inactivo</span>';
+
+            $nameCell = '<div class="d-flex align-items-center gap-2">'
+                . '<img class="rounded-circle" width="32" height="32" alt="' . esc($e->name, 'attr') . '" src="' . esc($photo, 'attr') . '" style="object-fit:cover;">'
+                . '<a class="fw-semibold text-primary text-decoration-none" href="' . esc($editUrl, 'attr') . '">'
+                . esc($e->name . ' ' . $e->lastname) . '</a></div>';
+
+            $data[] = [
+                $nameCell,
+                esc($e->employee_number ?? ''),
+                esc($e->email ?? ''),
+                esc($e->ocupation_name ?? '-'),
+                esc($e->department_name ?? '-'),
+                esc($e->area_name ?? '-'),
+                esc(trim($e->parent_name ?? '') !== '' ? $e->parent_name : '-'),
+                $status,
+            ];
+        }
+
+        return $this->response->setJSON([
+            'draw'            => $draw,
+            'recordsTotal'    => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data'            => $data,
+        ]);
+    }
+
+    /**
+     * Exporta a CSV todos los empleados que cumplen los filtros/búsqueda activos.
+     */
+    public function export()
+    {
+        $params           = $this->dataTableParams();
+        $params['length'] = -1; // sin paginación: todos los resultados filtrados
+        $params['start']  = 0;
+
+        $employees = $this->employeeModel->getDataTable($params);
+
+        $filename = 'empleados_' . date('Y-m-d_His') . '.csv';
+
+        // Construimos el CSV en memoria y lo devolvemos como cuerpo de la respuesta
+        // para que CodeIgniter emita los headers de descarga correctamente.
+        $output = fopen('php://temp', 'r+');
+        // BOM para que Excel reconozca UTF-8 (acentos).
+        fwrite($output, "\xEF\xBB\xBF");
+        fputcsv($output, ['No. Empleado', 'Nombre', 'Apellido', 'E-mail', 'Puesto', 'Departamento', 'Área', 'Jefe directo', 'Estatus']);
+
+        foreach ($employees as $e) {
+            fputcsv($output, [
+                $e->employee_number,
+                $e->name,
+                $e->lastname,
+                $e->email,
+                $e->ocupation_name,
+                $e->department_name,
+                $e->area_name,
+                trim($e->parent_name ?? ''),
+                $e->active == 1 ? 'Activo' : 'Inactivo',
+            ]);
+        }
+        rewind($output);
+        $csv = stream_get_contents($output);
+        fclose($output);
+
+        return $this->response
+            ->setHeader('Content-Type', 'text/csv; charset=UTF-8')
+            ->setHeader('Content-Disposition', 'attachment; filename="' . $filename . '"')
+            ->setBody($csv);
+    }
+
+    /**
+     * Normaliza los parámetros que envía DataTables (server-side) + filtros propios.
+     */
+    private function dataTableParams(): array
+    {
+        $search = $this->request->getGet('search');
+        $order  = $this->request->getGet('order');
+
+        return [
+            'start'       => $this->request->getGet('start'),
+            'length'      => $this->request->getGet('length'),
+            'search'      => is_array($search) ? ($search['value'] ?? '') : '',
+            'orderColumn' => (is_array($order) && isset($order[0]['column'])) ? $order[0]['column'] : 0,
+            'orderDir'    => (is_array($order) && isset($order[0]['dir'])) ? $order[0]['dir'] : 'asc',
+            'department'  => $this->request->getGet('department'),
+            'area'        => $this->request->getGet('area'),
+            'ocupation'   => $this->request->getGet('ocupation'),
+            'status'      => $this->request->getGet('status'),
+        ];
     }
 
     public function newUser(): string

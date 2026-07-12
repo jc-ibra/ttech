@@ -7,8 +7,15 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
     <?php if (strpos(uri_string(), 'directorio') !== false || strpos(uri_string(), 'ocupation') !== false || strpos(uri_string(), 'department') !== false || strpos(uri_string(), 'area') !== false || strpos(uri_string(), 'custom-organigram') !== false || strpos(uri_string(), 'empleados') !== false || strpos(uri_string(), 'usuarios') !== false): ?>
-      <!-- Datatable -->
+      <!-- DataTables núcleo -->
       <script src="//cdn.datatables.net/2.1.7/js/dataTables.min.js"></script>
+      <!-- DataTables Buttons (columnas + exportación) -->
+      <script src="//cdn.datatables.net/buttons/3.1.2/js/dataTables.buttons.min.js"></script>
+      <script src="//cdn.datatables.net/buttons/3.1.2/js/buttons.colVis.min.js"></script>
+      <script src="//cdn.datatables.net/buttons/3.1.2/js/buttons.html5.min.js"></script>
+      <script src="//cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+      <!-- Inicialización estándar de tablas admin -->
+      <script src="<?= base_url('assets/js/admin-tables.js') ?>"></script>
     <?php endif; ?>
 
 

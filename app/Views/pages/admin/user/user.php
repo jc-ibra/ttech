@@ -4,114 +4,132 @@
       <div class="page-header">
         <div>
           <h5 class="page-header__title">Empleados</h5>
-          <p class="page-header__subtitle">Gestión de empleados y accesos</p>
+          <p class="page-header__subtitle">Gestión de empleados y estructura organizacional</p>
         </div>
         <div class="d-flex gap-2">
-          <button class="btn btn-outline-secondary" id="btnBuscar">
-            <i class="ti ti-search me-1"></i>Buscar
+          <button class="btn btn-outline-secondary" id="btnExport">
+            <i class="ti ti-download me-1"></i>Exportar
           </button>
           <a href="<?= base_url('empleados/new') ?>" class="btn btn-primary">
             <i class="ti ti-plus me-1"></i>Nuevo
           </a>
         </div>
       </div>
+
+      <!-- Filtros -->
+      <div class="row g-2 mb-3">
+        <div class="col-12 col-md-3">
+          <label class="form-label small text-muted mb-1">Estatus</label>
+          <select id="filterStatus" class="form-select form-select-sm js-emp-filter">
+            <option value="">Todos</option>
+            <option value="1">Activos</option>
+            <option value="0">Inactivos</option>
+          </select>
+        </div>
+        <div class="col-12 col-md-3">
+          <label class="form-label small text-muted mb-1">Departamento</label>
+          <select id="filterDepartment" class="form-select form-select-sm js-emp-filter">
+            <option value="">Todos</option>
+            <?php foreach ($departments as $d): ?>
+              <option value="<?= $d->id ?>"><?= esc($d->name) ?></option>
+            <?php endforeach ?>
+          </select>
+        </div>
+        <div class="col-12 col-md-3">
+          <label class="form-label small text-muted mb-1">Área</label>
+          <select id="filterArea" class="form-select form-select-sm js-emp-filter">
+            <option value="">Todas</option>
+            <?php foreach ($areas as $a): ?>
+              <option value="<?= $a->id ?>"><?= esc($a->name) ?></option>
+            <?php endforeach ?>
+          </select>
+        </div>
+        <div class="col-12 col-md-3">
+          <label class="form-label small text-muted mb-1">Puesto</label>
+          <select id="filterOcupation" class="form-select form-select-sm js-emp-filter">
+            <option value="">Todos</option>
+            <?php foreach ($ocupations as $o): ?>
+              <option value="<?= $o->id ?>"><?= esc($o->name) ?></option>
+            <?php endforeach ?>
+          </select>
+        </div>
+      </div>
+
       <div class="table-responsive">
-        <table class="table table-hover align-middle" id="dt_table_users">
+        <table class="table table-hover align-middle w-100" id="dt_table_users">
           <thead>
             <tr>
               <th>Nombre</th>
-              <th>Jefe directo</th>
-              <th>E-mail</th>
               <th>No. Empleado</th>
+              <th>E-mail</th>
+              <th>Puesto</th>
+              <th>Departamento</th>
+              <th>Área</th>
+              <th>Jefe directo</th>
               <th>Estatus</th>
             </tr>
           </thead>
-          <tbody>
-            <?php foreach($users as $user): ?>
-              <?php if( !$user->ghost ): ?>
-                <tr>
-                  <td>
-                    <div class="d-flex align-items-center gap-2">
-                      <img class="rounded-circle" width="32" height="32" alt="<?= $user->name ?>" src="<?= base_url($user->photo) ?>" style="object-fit:cover;">
-                      <a class="fw-semibold text-primary text-decoration-none" href="<?= base_url('empleados/edit/'.$user->id) ?>">
-                        <?= $user->name ?> <?= $user->lastname ?>
-                      </a>
-                    </div>
-                  </td>
-                  <td><?= $user->parent_name ?? '-' ?></td>
-                  <td><?= $user->email ?></td>
-                  <td><?= $user->employee_number ?></td>
-                  <td>
-                    <span class="<?= $user->active == 1 ? 'badge-success' : 'badge-critical' ?>">
-                      <?= $user->active == 1 ? 'Activo' : 'Inactivo' ?>
-                    </span>
-                  </td>
-                </tr>
-              <?php endif ?>
-            <?php endforeach ?>
-          </tbody>
+          <tbody></tbody>
         </table>
       </div>
     </div>
   </div>
 </div>
-<div class="modal" id="searchUser" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="searchUser" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered ">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="searchUserText">Buscar empleado</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body feed">
-        <p>Selecciona empleado</p>
-        <div class="mb-3">
-          <select name="userSearch" id="userSearch" class="form-select select2">
-            <option></option>
-            <?php foreach($users as $user): ?>
-              <?php if( !$user->ghost ): ?>
-                <option value="<?= $user->id ?>">
-                  <?= $user->name ?> <?= $user->lastname ?> - <?= $user->employee_number ?>
-                </option>
-              <?php endif ?>
-            <?php endforeach ?>
-          </select>
-        </div>
-        <div class="d-flex justify-content-end">
-          <button type="button" class="btn btn-outline-primary d-block ms-2" id="irUsuario">Ver empleado</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- Select2 -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <script>
-  $('#dt_table_users').DataTable().destroy();
-  $('#dt_table_users').DataTable({
+  $(function () {
+    var tabla = $('#dt_table_users').DataTable({
+      processing: true,
+      serverSide: true,
+      language: window.DT_ES,
       order: [[0, 'asc']],
-      language: {url: 'https://cdn.datatables.net/plug-ins/1.10.10/i18n/Spanish.json'},
-      dom: 'Bfrtip',
+      pageLength: 25,
+      lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+      ajax: {
+        url: base_url + 'empleados/data',
+        data: function (d) {
+          d.status     = $('#filterStatus').val();
+          d.department = $('#filterDepartment').val();
+          d.area       = $('#filterArea').val();
+          d.ocupation  = $('#filterOcupation').val();
+        }
+      },
+      columns: [
+        { data: 0 },                    // Nombre (HTML)
+        { data: 1 },                    // No. Empleado
+        { data: 2 },                    // E-mail
+        { data: 3 },                    // Puesto
+        { data: 4 },                    // Departamento
+        { data: 5 },                    // Área
+        { data: 6 },                    // Jefe directo
+        { data: 7 }                     // Estatus (HTML)
+      ],
       buttons: [
-        {
-          extend: 'colvis',
-          text: 'Columna personalizada',
-        },
-        'csv', 'excel'
-      ]
-  });
-  $('#btnBuscar').on('click', function() {
-    $('#searchUser').modal('show');
-  });
-  $('.select2').select2({
-    placeholder: 'Empleado',
-    allowClear: true,
-    dropdownParent: $('#searchUser')
-  });
-  $('#irUsuario').on('click', function() {
-    var userId = $('#userSearch').val();
-    if(userId){
-      window.location.href = base_url + 'empleados/edit/' + userId;
-    }
+        { extend: 'colvis', text: '<i class="ti ti-columns"></i> Columnas', className: 'btn btn-sm btn-outline-secondary' }
+      ],
+      layout: {
+        topStart: 'buttons',
+        topEnd: 'search',
+        bottomStart: ['pageLength', 'info'],
+        bottomEnd: 'paging'
+      }
+    });
+
+    // Al cambiar cualquier filtro, recargar desde el servidor.
+    $('.js-emp-filter').on('change', function () {
+      tabla.ajax.reload();
+    });
+
+    // Exportar CSV respetando filtros y búsqueda activos.
+    $('#btnExport').on('click', function () {
+      var params = $.param({
+        status: $('#filterStatus').val(),
+        department: $('#filterDepartment').val(),
+        area: $('#filterArea').val(),
+        ocupation: $('#filterOcupation').val(),
+        'search[value]': tabla.search()
+      });
+      window.location = base_url + 'empleados/export?' + params;
+    });
   });
 </script>

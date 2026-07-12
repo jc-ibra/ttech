@@ -12,8 +12,37 @@
           </a>
         </div>
       </div>
+      <!-- Filtros -->
+      <div class="row g-2 mb-3">
+        <div class="col-12 col-md-3">
+          <label class="form-label small text-muted mb-1">Rol</label>
+          <select class="form-select form-select-sm js-dt-filter" data-table-target="#dt_table_accounts" data-column="2">
+            <option value="">Todos</option>
+            <option value="Administrador">Administrador</option>
+            <option value="Operador">Operador</option>
+            <option value="Usuario">Usuario</option>
+          </select>
+        </div>
+        <div class="col-12 col-md-3">
+          <label class="form-label small text-muted mb-1">Origen</label>
+          <select class="form-select form-select-sm js-dt-filter" data-table-target="#dt_table_accounts" data-column="3">
+            <option value="">Todos</option>
+            <option value="Nexus">Nexus</option>
+            <option value="Manual">Manual</option>
+          </select>
+        </div>
+        <div class="col-12 col-md-3">
+          <label class="form-label small text-muted mb-1">Estatus</label>
+          <select class="form-select form-select-sm js-dt-filter" data-table-target="#dt_table_accounts" data-column="4">
+            <option value="">Todos</option>
+            <option value="Activo">Activo</option>
+            <option value="Inactivo">Inactivo</option>
+          </select>
+        </div>
+      </div>
+
       <div class="table-responsive">
-        <table class="table table-hover align-middle" id="dt_table_accounts">
+        <table class="table table-hover align-middle w-100 js-datatable" id="dt_table_accounts" data-order-col="0" data-order-dir="asc">
           <thead>
             <tr>
               <th>Nombre</th>
@@ -61,15 +90,3 @@
     </div>
   </div>
 </div>
-<script>
-  $('#dt_table_accounts').DataTable().destroy();
-  $('#dt_table_accounts').DataTable({
-      order: [[0, 'asc']],
-      language: {url: 'https://cdn.datatables.net/plug-ins/1.10.10/i18n/Spanish.json'},
-      dom: 'Bfrtip',
-      buttons: [
-        { extend: 'colvis', text: 'Columna personalizada' },
-        'csv', 'excel'
-      ]
-  });
-</script>

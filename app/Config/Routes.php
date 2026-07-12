@@ -65,6 +65,8 @@ $routes->group('', ['filter' => 'auth:admin,operator'], function($routes) {
 
     /* Empleados (organigrama) */
     $routes->get('/empleados', 'Employee::index');
+    $routes->get('/empleados/data', 'Employee::datatable');
+    $routes->get('/empleados/export', 'Employee::export');
     $routes->get('/empleados/new', 'Employee::newUser');
     $routes->get('/empleados/edit/(:num)', 'Employee::editUser/$1');
     $routes->post('/empleados/register', 'Employee::register');
@@ -129,6 +131,10 @@ $routes->group('', ['filter' => 'auth:admin'], function($routes) {
     $routes->post('/usuarios/update', 'User::update');
     $routes->post('/usuarios/active', 'User::activeUser');
     $routes->post('/usuarios/inactive', 'User::inactiveUser');
+
+    /* Contenido de la landing "Trantor Technologies" */
+    $routes->get('/landing', 'Landing::index');
+    $routes->post('/landing/update', 'Landing::update');
 
     /* Catálogos (hub de Puestos, Departamentos y Áreas) */
     $routes->get('/catalogos', 'Catalogos::index');
