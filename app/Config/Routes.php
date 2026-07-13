@@ -129,6 +129,7 @@ $routes->group('', ['filter' => 'auth:admin'], function($routes) {
     $routes->get('/usuarios/edit/(:num)', 'User::editUser/$1');
     $routes->post('/usuarios/create', 'User::create');
     $routes->post('/usuarios/update', 'User::update');
+    $routes->post('/usuarios/update/photo', 'User::updateUserPhoto');
     $routes->post('/usuarios/active', 'User::activeUser');
     $routes->post('/usuarios/inactive', 'User::inactiveUser');
 

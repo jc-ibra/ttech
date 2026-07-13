@@ -147,6 +147,39 @@ class User extends BaseController
         return HelperUtility::redirectWithMessage("/usuarios/edit/$id", lang('Errors.error_try_again_later'));
     }
 
+    /**
+     * Actualiza la foto de perfil de un usuario concreto desde la edición
+     * (usuarios/edit/{id}). Solo aplica a cuentas de origen manual: las de
+     * Nexus son de solo lectura.
+     */
+    public function updateUserPhoto()
+    {
+        $id     = $this->request->getPost('id');
+        $actual = $this->userModel->getUsers($id);
+
+        if (!$actual) {
+            return $this->respondWithCsrf([
+                'ok'      => false,
+                'message' => lang('Errors.user_not_found'),
+            ]);
+        }
+
+        if (!empty($actual->nexus_id)) {
+            return $this->respondWithCsrf([
+                'ok'      => false,
+                'message' => lang('Errors.user_nexus_readonly'),
+            ]);
+        }
+
+        $result = $this->savePhoto($actual);
+
+        if ($result['ok'] && $id == session('user')->id) {
+            $this->refreshSession();
+        }
+
+        return $this->respondWithCsrf($result);
+    }
+
     public function activeUser()
     {
         $id = $this->request->getPost('id');
@@ -280,50 +313,63 @@ class User extends BaseController
 
     public function updatePhoto()
     {
-        $photo = $this->request->getFile('photo');
+        $actualUser = $this->userModel->getUsers(session('user')->id);
+        $result     = $this->savePhoto($actualUser);
 
-        if ($photo && $photo->isValid() && !$photo->hasMoved()) {
-
-            $actualUser = $this->userModel->getUsers(session('user')->id);
-
-            if (!in_array($photo->getClientMimeType(), ['image/jpeg', 'image/png', 'image/jpg'])) {
-                return $this->respondWithCsrf([
-                    'ok'      => false,
-                    'message' => lang('Errors.gral_upload_file_error'),
-                ]);
-            }
-
-            $uploadPath = ROOTPATH . 'public/uploads/images/profiles';
-            if (!is_dir($uploadPath)) {
-                mkdir($uploadPath, 0755, true);
-            }
-
-            $newName = $photo->getRandomName();
-            $photo->move($uploadPath, $newName);
-            $newImage = 'uploads/images/profiles/' . $newName;
-
-            if ($actualUser->photo != 'assets/images/anonimo.jpg' && file_exists(ROOTPATH . 'public/' . $actualUser->photo)) {
-                unlink(ROOTPATH . 'public/' . $actualUser->photo);
-            }
-
-            if ($this->userModel->setNewPhoto(session('user')->id, $newImage)) {
-                $this->refreshSession();
-                return $this->respondWithCsrf([
-                    'ok'      => true,
-                    'message' => lang('Success.auth_photo_updated'),
-                ]);
-            }
-
-            return $this->respondWithCsrf([
-                'ok'      => false,
-                'message' => lang('Errors.error_try_again_later'),
-            ]);
+        if ($result['ok']) {
+            $this->refreshSession();
         }
 
-        return $this->respondWithCsrf([
+        return $this->respondWithCsrf($result);
+    }
+
+    /**
+     * Procesa la subida de la foto de perfil de $actualUser: valida el archivo,
+     * lo mueve a public/uploads/images/profiles, elimina la foto anterior y
+     * persiste la nueva ruta. Devuelve ['ok' => bool, 'message' => string].
+     */
+    private function savePhoto($actualUser): array
+    {
+        $photo = $this->request->getFile('photo');
+
+        if (!$photo || !$photo->isValid() || $photo->hasMoved()) {
+            return [
+                'ok'      => false,
+                'message' => lang('Errors.auth_invalid_image'),
+            ];
+        }
+
+        if (!in_array($photo->getClientMimeType(), ['image/jpeg', 'image/png', 'image/jpg'])) {
+            return [
+                'ok'      => false,
+                'message' => lang('Errors.gral_upload_file_error'),
+            ];
+        }
+
+        $uploadPath = ROOTPATH . 'public/uploads/images/profiles';
+        if (!is_dir($uploadPath)) {
+            mkdir($uploadPath, 0755, true);
+        }
+
+        $newName = $photo->getRandomName();
+        $photo->move($uploadPath, $newName);
+        $newImage = 'uploads/images/profiles/' . $newName;
+
+        if ($actualUser->photo != 'assets/images/anonimo.jpg' && file_exists(ROOTPATH . 'public/' . $actualUser->photo)) {
+            unlink(ROOTPATH . 'public/' . $actualUser->photo);
+        }
+
+        if ($this->userModel->setNewPhoto($actualUser->id, $newImage)) {
+            return [
+                'ok'      => true,
+                'message' => lang('Success.auth_photo_updated'),
+            ];
+        }
+
+        return [
             'ok'      => false,
-            'message' => lang('Errors.auth_invalid_image'),
-        ]);
+            'message' => lang('Errors.error_try_again_later'),
+        ];
     }
 
     private function refreshSession()

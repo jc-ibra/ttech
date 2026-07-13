@@ -19,6 +19,30 @@
         </div>
       <?php endif; ?>
 
+      <?php if (!$isNexus): ?>
+        <div class="user-photo">
+          <img id="photoPreview" class="user-photo__avatar"
+               src="<?= base_url($user->photo) ?>"
+               alt="<?= esc($user->name) ?>"
+               onerror="this.onerror=null;this.src='<?= base_url('assets/images/anonimo.jpg') ?>';">
+          <div class="user-photo__body">
+            <span class="user-photo__label">Foto de perfil</span>
+            <span class="user-photo__hint">JPG o PNG.</span>
+            <div class="user-photo__actions">
+              <button type="button" class="btn btn-outline-primary btn-sm" id="photoPick">
+                <i class="ti ti-camera me-1"></i>Cambiar foto
+              </button>
+              <button type="button" class="btn btn-primary btn-sm" id="photoSave" style="display:none;">
+                <span class="photo-save__label"><i class="ti ti-device-floppy me-1"></i>Guardar foto</span>
+                <span class="photo-save__spinner" style="display:none;"><span class="spinner-border spinner-border-sm"></span> Guardando…</span>
+              </button>
+            </div>
+            <div id="photo__response" class="user-photo__msg" style="display:none;"></div>
+          </div>
+          <input type="file" id="photoInput" accept="image/jpeg,image/png,image/jpg" hidden>
+        </div>
+      <?php endif; ?>
+
       <form method="post" action="<?= base_url('usuarios/update') ?>">
         <?php echo csrf_field(); ?>
         <input type="hidden" id="id" name="id" value="<?= $user->id ?>">
@@ -120,5 +144,112 @@
 
     $('#active_user').on('click', function() { toggleAccount('active'); });
     $('#inactive_user').on('click', function() { toggleAccount('inactive'); });
+
+    /* ------- Foto de perfil ------- */
+    var selectedFile = null;
+    var $photoMsg    = $('#photo__response');
+    var $photoSave   = $('#photoSave');
+
+    function showPhotoMsg(text, ok) {
+      $photoMsg.text(text)
+               .toggleClass('is-error', !ok)
+               .toggleClass('is-success', !!ok)
+               .show();
+    }
+    function setPhotoLoading(loading) {
+      $photoSave.prop('disabled', loading);
+      $photoSave.find('.photo-save__label').toggle(!loading);
+      $photoSave.find('.photo-save__spinner').toggle(loading);
+    }
+
+    $('#photoPick').on('click', function() { $('#photoInput').trigger('click'); });
+
+    $('#photoInput').on('change', function() {
+      var file = this.files && this.files[0];
+      if (!file) return;
+
+      if (['image/jpeg', 'image/png', 'image/jpg'].indexOf(file.type) === -1) {
+        showPhotoMsg('La imagen no es válida. Usa JPG o PNG.', false);
+        this.value = '';
+        return;
+      }
+
+      selectedFile = file;
+      $photoMsg.hide();
+      $('#photoPreview').attr('src', URL.createObjectURL(file));
+      $photoSave.show();
+    });
+
+    $photoSave.on('click', function() {
+      if (!selectedFile) return;
+
+      var formData = new FormData();
+      formData.append('id', userId);
+      formData.append('photo', selectedFile);
+      formData.append(csrfName, csrfHash);
+
+      setPhotoLoading(true);
+
+      $.ajax({
+        url: baseUrl + '/update/photo',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        dataType: 'json',
+        success: function(resp) {
+          if (resp.csrf_name && resp.csrf_token) {
+            csrfName = resp.csrf_name;
+            csrfHash = resp.csrf_token;
+            if (typeof actualizarCsrfToken === 'function') {
+              actualizarCsrfToken(resp.csrf_name, resp.csrf_token);
+            }
+          }
+          setPhotoLoading(false);
+          if (resp.ok) {
+            selectedFile = null;
+            $('#photoInput').val('');
+            $photoSave.hide();
+            showPhotoMsg(resp.message || 'Foto de perfil actualizada', true);
+          } else {
+            showPhotoMsg(resp.message || 'No se pudo actualizar la foto.', false);
+          }
+        },
+        error: function() {
+          setPhotoLoading(false);
+          showPhotoMsg('Ocurrió un error. Inténtalo de nuevo más tarde.', false);
+        }
+      });
+    });
   });
 </script>
+
+<style>
+  .user-photo {
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+    padding: 1.1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--color-neutral-200, #e5e7eb);
+    border-radius: 14px;
+    background: var(--bg-page, #f8f9fa);
+  }
+  .user-photo__avatar {
+    width: 76px; height: 76px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 1px var(--color-neutral-200, #e5e7eb);
+    background: #fff;
+  }
+  .user-photo__body { display: flex; flex-direction: column; gap: 0.25rem; }
+  .user-photo__label { font-size: 0.95rem; font-weight: 700; color: var(--text-primary, #1f2937); }
+  .user-photo__hint  { font-size: 0.78rem; color: var(--text-muted, #6b7280); }
+  .user-photo__actions { display: flex; gap: 0.5rem; margin-top: 0.4rem; flex-wrap: wrap; }
+  .photo-save__label, .photo-save__spinner { display: inline-flex; align-items: center; gap: 0.35rem; }
+  .user-photo__msg { font-size: 0.82rem; margin-top: 0.35rem; }
+  .user-photo__msg.is-error   { color: var(--bs-danger, #d72c0d); }
+  .user-photo__msg.is-success { color: var(--color-success-default, #198754); }
+</style>
