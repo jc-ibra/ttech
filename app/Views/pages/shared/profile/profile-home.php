@@ -43,6 +43,11 @@
       <div class="profile-card__id">
         <h5 class="profile-card__name"><?= esc($user->name) ?> <?= esc($user->lastname) ?></h5>
         <span class="profile-card__role"><i class="ti ti-shield-check"></i> <?= $rolLabel ?></span>
+        <?php if (!empty($user->employee_number)): ?>
+          <span class="profile-emp-badge" title="Número de empleado">
+            <i class="ti ti-id-badge-2"></i> N.º de empleado: <strong><?= esc($user->employee_number) ?></strong>
+          </span>
+        <?php endif; ?>
       </div>
     </div>
 
@@ -52,12 +57,8 @@
         <span class="profile-info__value"><?= esc($user->email) ?></span>
       </div>
       <div class="profile-info">
-        <span class="profile-info__label">Rol</span>
-        <span class="profile-info__value"><?= $rolLabel ?></span>
-      </div>
-      <div class="profile-info">
-        <span class="profile-info__label">Último acceso</span>
-        <span class="profile-info__value"><?= $fmt($user->last_login) ?></span>
+        <span class="profile-info__label">Número de empleado</span>
+        <span class="profile-info__value"><?= !empty($user->employee_number) ? esc($user->employee_number) : 'No asignado' ?></span>
       </div>
       <div class="profile-info">
         <span class="profile-info__label">Miembro desde</span>
@@ -324,6 +325,22 @@
     background: var(--color-blue-50);
     padding: 0.25rem 0.7rem;
     border-radius: 50px;
+  }
+  /* Número de empleado: badge destacado, dato de uso frecuente en la intranet */
+  .profile-emp-badge {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    margin-left: 0.5rem;
+    font-size: 0.85rem; font-weight: 600;
+    color: #92400e;
+    background: #fef3c7;
+    border: 1px solid #fcd34d;
+    padding: 0.3rem 0.8rem;
+    border-radius: 50px;
+  }
+  .profile-emp-badge strong { font-weight: 800; letter-spacing: 0.02em; }
+  .profile-emp-badge i { font-size: 1rem; }
+  @media (max-width: 575.98px) {
+    .profile-emp-badge { margin-left: 0; margin-top: 0.4rem; }
   }
   .profile-card__grid {
     display: grid;

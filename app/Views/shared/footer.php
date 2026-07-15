@@ -93,7 +93,10 @@
   <?php if (strpos(uri_string(), 'custom-organigram') !== false): ?>
     <!-- Custom Organigram -->
     <script src="<?= base_url('assets/js/custom-organigram.js') ?>"></script>
-  <?php endif; ?>  
+  <?php endif; ?>
 
-  </body> 
+  <!-- ServiceDesk Widget -->
+  <script src="http://localhost:8080/servicedesk/widget/embed.js?key=wgt_5265387f24e4f119bf348633ff51be08" async></script>
+
+  </body>
 </html>

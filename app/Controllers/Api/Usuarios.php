@@ -79,14 +79,29 @@ class Usuarios extends BaseController
 
         $activo = (!isset($body['estado']) || $body['estado'] === 'activo') ? 1 : 0;
 
+        // El número de empleado es opcional/tolerante: si viene vacío o no
+        // viene, se guarda NULL sin fallar. No es llave de recurso.
+        $numeroEmpleado = isset($body['numero_empleado']) && $body['numero_empleado'] !== ''
+            ? trim((string) $body['numero_empleado'])
+            : null;
+
+        if ($numeroEmpleado !== null && mb_strlen($numeroEmpleado) > 20) {
+            return $this->json([
+                'exito'        => false,
+                'error_codigo' => 'CAMPO_INVALIDO',
+                'mensaje'      => "El campo 'numero_empleado' no puede exceder 20 caracteres",
+            ], 400);
+        }
+
         $id = $this->userModel->createUser([
-            'nexus_id' => $body['nexus_id'],
-            'name'     => $body['nombre'],
-            'lastname' => $body['apellidos'],
-            'email'    => $body['correo'],
-            'password' => password_hash($body['password'], PASSWORD_DEFAULT),
-            'rol'      => 'user',
-            'active'   => $activo,
+            'nexus_id'        => $body['nexus_id'],
+            'employee_number' => $numeroEmpleado,
+            'name'            => $body['nombre'],
+            'lastname'        => $body['apellidos'],
+            'email'           => $body['correo'],
+            'password'        => password_hash($body['password'], PASSWORD_DEFAULT),
+            'rol'             => 'user',
+            'active'          => $activo,
         ]);
 
         if (!$id) {
@@ -238,6 +253,23 @@ class Usuarios extends BaseController
 
         if (array_key_exists('nombre', $body))    $data['name']     = $body['nombre'];
         if (array_key_exists('apellidos', $body)) $data['lastname'] = $body['apellidos'];
+
+        // Actualización parcial del número de empleado: sólo se toca si llega
+        // con valor. Si el campo no viene (o viene vacío), se deja intacto y
+        // NO se pone en NULL. No es llave de búsqueda: seguimos usando nexus_id.
+        if (isset($body['numero_empleado']) && $body['numero_empleado'] !== '') {
+            $numeroEmpleado = trim((string) $body['numero_empleado']);
+
+            if (mb_strlen($numeroEmpleado) > 20) {
+                return $this->json([
+                    'exito'        => false,
+                    'error_codigo' => 'CAMPO_INVALIDO',
+                    'mensaje'      => "El campo 'numero_empleado' no puede exceder 20 caracteres",
+                ], 400);
+            }
+
+            $data['employee_number'] = $numeroEmpleado;
+        }
 
         if (array_key_exists('correo', $body)) {
             $existente = $this->userModel->where('email', $body['correo'])->withDeleted()->first();
