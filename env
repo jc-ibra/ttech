@@ -36,7 +36,7 @@
 # database.default.password = ''
 # database.default.DBDriver = ''
 # database.default.DBPrefix =
-# database.default.port = 
+# database.default.port =
 
 # If you use MySQLi as tests, first update the values of Config\Database::$tests.
 # database.tests.hostname = ''
@@ -47,7 +47,7 @@
 # database.tests.DBPrefix =
 # database.tests.charset = ''
 # database.tests.DBCollat = ''
-# database.tests.port = 
+# database.tests.port =
 
 #--------------------------------------------------------------------
 # ENCRYPTION
@@ -66,4 +66,17 @@
 # LOGGER
 #--------------------------------------------------------------------
 
-# logger.threshold = 
+# logger.threshold =
+
+#--------------------------------------------------------------------
+# EXTERNAL PROVISIONING
+#--------------------------------------------------------------------
+
+# NEXUS_API_KEY
+
+#--------------------------------------------------------------------
+# SUPPORT WIDGET (ServiceDesk)
+#--------------------------------------------------------------------
+
+# SUPPORT_WIDGET_ENABLED = false
+# SUPPORT_WIDGET_URL = https://helpdesk.trantortechnologies.mx/servicedesk/widget/embed.js?key=your-widget-key-here

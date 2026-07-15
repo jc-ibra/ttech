@@ -96,7 +96,22 @@
   <?php endif; ?>
 
   <!-- ServiceDesk Widget -->
-  <script src="http://localhost:8080/servicedesk/widget/embed.js?key=wgt_5265387f24e4f119bf348633ff51be08" async></script>
+  <?php if (env('SUPPORT_WIDGET_ENABLED', false)): ?>
+    <?php $ttUser = session('user'); ?>
+    <?php if ($ttUser): ?>
+      <!-- Identidad del usuario en sesión: DEBE ir ANTES del loader del widget -->
+      <script>
+        window.ttSupportWidgetUser = {
+          nombre: "<?= esc(trim(($ttUser->name ?? '') . ' ' . ($ttUser->lastname ?? '')), 'js') ?>",
+          correo: "<?= esc($ttUser->email ?? '', 'js') ?>",
+          numero_empleado: "<?= esc($ttUser->employee_number ?? '', 'js') ?>"
+        };
+      </script>
+    <?php endif; ?>
+
+    <!-- Loader del widget -->
+    <script src="<?= esc(env('SUPPORT_WIDGET_URL', 'http://localhost:8080/servicedesk/widget/embed.js?key=wgt_5265387f24e4f119bf348633ff51be08')) ?>" async></script>
+  <?php endif; ?>
 
   </body>
 </html>
