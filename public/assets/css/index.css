@@ -589,6 +589,98 @@ a:not(.btn):not(.nav-link):not(.dropdown-item):not(.sidebar-link):not(.button):n
     max-height: 80vh;
     overflow: auto;
 }
+
+/* Estado vacío del feed (/trantor-informa) */
+.tinf__empty{
+    overflow: hidden;
+    text-align: center;
+}
+.tinf__empty__art{
+    background: linear-gradient(180deg, var(--color-blue-50) 0%, var(--white) 100%);
+    padding: var(--space-6) var(--space-4) 0;
+}
+.tinf__empty__art svg{
+    display: block;
+    width: 100%;
+    max-width: 260px;
+    height: auto;
+    margin: 0 auto;
+}
+.tinf__empty__body{
+    padding: var(--space-2) var(--space-8) var(--space-8);
+}
+.tinf__empty__badge{
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 4px 12px;
+    margin-bottom: var(--space-3);
+    border-radius: var(--radius-full);
+    background: var(--color-blue-50);
+    color: var(--color-blue-600);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+.tinf__empty__body h5{
+    margin: 0 0 var(--space-2);
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--text-primary);
+}
+.tinf__empty__body p{
+    margin: 0 auto;
+    max-width: 380px;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: var(--text-muted);
+}
+.tinf__empty__hints{
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-2);
+    margin: var(--space-5) 0 0;
+    padding: 0;
+}
+.tinf__empty__hints li{
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 5px 12px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-neutral-200);
+    background: var(--color-neutral-50);
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    font-weight: 500;
+}
+.tinf__empty__hints li i{
+    color: var(--color-blue-500);
+    font-size: 0.95rem;
+}
+.tinf__empty__cta{
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: var(--space-5);
+    padding: 8px 18px;
+    border: none;
+    border-radius: var(--radius-full);
+    background: var(--primary);
+    color: var(--white);
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: background-color var(--duration-base) var(--ease-default);
+}
+.tinf__empty__cta:hover{
+    background: var(--color-blue-600);
+}
+.tinf__empty__cta:focus-visible{
+    outline: none;
+    box-shadow: var(--shadow-focus);
+}
 .image__container-4{
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -1800,6 +1892,9 @@ rt, .dropup, .dropup-center{
     }
     .tinf__card{
         width: 100%;
+    }
+    .tinf__empty__body{
+        padding: var(--space-2) var(--space-5) var(--space-6);
     }
     #suggestion__wrapper_main{
         display: none;
