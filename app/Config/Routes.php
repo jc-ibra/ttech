@@ -137,6 +137,12 @@ $routes->group('', ['filter' => 'auth:admin'], function($routes) {
     $routes->get('/landing', 'Landing::index');
     $routes->post('/landing/update', 'Landing::update');
 
+    /* Configuración de la intranet (visibilidad de secciones y sistemas externos) */
+    $routes->get('/configuracion', 'Settings::index');
+    $routes->post('/configuracion/update', 'Settings::update');
+    $routes->post('/configuracion/sistemas/save', 'Settings::saveSystem');
+    $routes->post('/configuracion/sistemas/delete', 'Settings::deleteSystem');
+
     /* Catálogos (hub de Puestos, Departamentos y Áreas) */
     $routes->get('/catalogos', 'Catalogos::index');
 

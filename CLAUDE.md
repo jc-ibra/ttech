@@ -66,6 +66,14 @@ HTTP → public/index.php → Routes (app/Config/Routes.php) → Filters (Auth/R
 | Suggestions | `Suggestion.php` | `SuggestionModel.php` |
 | Alerts | `Alert.php` | `AlertModel.php` |
 | Directory | `Directorio.php` | `EmployeeModel.php` |
+| Landing content | `Landing.php` | `LandingContentModel.php` |
+| Configuración | `Settings.php` | `SettingModel.php`, `ExternalSystemModel.php` |
+
+**Configuración (`/configuracion`, sólo admin):** interruptores de visibilidad + alta de enlaces a sistemas externos.
+- `settings` es un almacén clave-valor (`organization_enabled`, `external_systems_enabled`); los defaults viven en `SettingModel::defaults()`, así que sin filas todo queda visible.
+- `external_systems` guarda los enlaces del bloque "Sistemas externos" (perfil y atajos del feed).
+- Las vistas consultan el helper global `app/Helpers/settings_helper.php` (`module_enabled()`, `external_systems()`), autocargado en `Config\Autoload::$helpers`.
+- `ModuleFilter` (alias `module`, aplicado por patrón de URI en `Config\Filters::$filters`) bloquea con 404 las rutas de un módulo apagado; el rol `admin` nunca se bloquea para poder seguir gestionándolo.
 
 ## Conventions
 

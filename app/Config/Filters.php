@@ -36,6 +36,7 @@ class Filters extends BaseFilters
         'performance'   => PerformanceMetrics::class,
         'auth'          => \App\Filters\AuthFilter::class,
         'api_auth'      => \App\Filters\ApiAuthFilter::class,
+        'module'        => \App\Filters\ModuleFilter::class,
     ];
 
     /**
@@ -121,5 +122,13 @@ class Filters extends BaseFilters
      *
      * @var array<string, array<string, list<string>>>
      */
-    public array $filters = [];
+    public array $filters = [
+        // Módulos que el administrador puede mostrar/ocultar desde /configuracion.
+        'module' => [
+            'before' => [
+                'organization',
+                'organization/*',
+            ],
+        ],
+    ];
 }

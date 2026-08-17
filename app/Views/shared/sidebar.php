@@ -6,6 +6,14 @@
   $act = function($needle) use ($uri) {
       return strpos($uri, $needle) !== false ? ' active' : '';
   };
+
+  // La sección de organigramas se puede apagar desde /configuracion.
+  $orgEnabled = module_enabled('organization_enabled');
+
+  // Destino del logotipo: el operador va a organigramas salvo que estén ocultos.
+  $brandUrl = ($rol === 'operator')
+      ? ($orgEnabled ? 'organization' : 'custom-organigram')
+      : 'trantor-informa';
 ?>
 <!-- Sidebar Start -->
 <div class="ntx-backdrop" id="ntxBackdrop"></div>
@@ -14,7 +22,7 @@
 
     <!-- Marca -->
     <div class="ntx-brand">
-      <a href="<?= base_url($rol === 'operator' ? 'organization' : 'trantor-informa') ?>">
+      <a href="<?= base_url($brandUrl) ?>">
         <img src="<?= base_url('assets/images/logos/logo-2.png') ?>" alt="Trantor Technologies" />
       </a>
     </div>
@@ -48,10 +56,13 @@
         </a>
       <?php endif; ?>
 
-      <a class="ntx-link<?= $act('organization') ?>" href="<?= base_url('organization') ?>">
-        <span class="ntx-ico"><i class="ti ti-hierarchy-2"></i></span>
-        <span class="ntx-label">Organigramas</span>
-      </a>
+      <?php // El admin sigue viendo el acceso (marcado como oculto) para poder gestionarlo. ?>
+      <?php if ($orgEnabled || $rol === 'admin'): ?>
+        <a class="ntx-link<?= $act('organization') ?>" href="<?= base_url('organization') ?>">
+          <span class="ntx-ico"><i class="ti ti-hierarchy-2"></i></span>
+          <span class="ntx-label">Organigramas<?= !$orgEnabled ? ' (oculto)' : '' ?></span>
+        </a>
+      <?php endif; ?>
 
       <?php if ($rol === 'operator'): ?>
         <a class="ntx-link<?= $act('custom-organigram') ?>" href="<?= base_url('custom-organigram') ?>">
@@ -98,6 +109,10 @@
         <a class="ntx-link<?= $act('landing') ?>" href="<?= base_url('landing') ?>">
           <span class="ntx-ico"><i class="ti ti-world-www"></i></span>
           <span class="ntx-label">Contenido T. Tech</span>
+        </a>
+        <a class="ntx-link<?= $act('configuracion') ?>" href="<?= base_url('configuracion') ?>">
+          <span class="ntx-ico"><i class="ti ti-settings"></i></span>
+          <span class="ntx-label">Configuración</span>
         </a>
         <a class="ntx-link<?= $act('suggestions') ?>" href="<?= base_url('suggestions') ?>">
           <span class="ntx-ico"><i class="ti ti-mail-opened"></i></span>

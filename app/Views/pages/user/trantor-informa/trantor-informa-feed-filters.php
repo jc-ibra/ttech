@@ -1,10 +1,7 @@
 <?php
-    // Atajos: mismos accesos directos que en /profile (sistemas externos)
-    $atajos = [
-        [ 'title' => 'Help Desk',                'icon' => 'ti ti-ticket', 'url' => 'https://helpdesk.trantortechnologies.mx/' ],
-        [ 'title' => 'Documentación GLPI',       'icon' => 'ti ti-book',   'url' => 'https://docs.helpdesk.trantortechnologies.mx/' ],
-        [ 'title' => 'Correo Staff',             'icon' => 'ti ti-mail',   'url' => 'https://mail.staff.trantortechnologies.mx/' ],
-    ];
+    // Atajos: mismos accesos directos que en /profile (sistemas externos).
+    // Se administran desde /configuracion; vacío = bloque apagado.
+    $atajos = external_systems();
 ?>
 <div class="tinf__card_filter feed-side-col">
 
@@ -45,6 +42,7 @@
 </div>
 
 <!-- Atajos -->
+<?php if (!empty($atajos)): ?>
 <div class="feed-side feed-shortcuts">
     <div class="feed-shortcuts__head">
         <span class="feed-side__label">Atajos</span>
@@ -52,14 +50,15 @@
     </div>
     <div class="feed-shortcuts__list">
         <?php foreach ($atajos as $a): ?>
-            <a href="<?= $a['url'] ?>" target="_blank" rel="noopener" class="feed-shortcut">
-                <span class="feed-shortcut__icon"><i class="<?= $a['icon'] ?>"></i></span>
-                <span class="feed-shortcut__text"><?= esc($a['title']) ?></span>
+            <a href="<?= esc($a->url, 'attr') ?>" target="_blank" rel="noopener" class="feed-shortcut">
+                <span class="feed-shortcut__icon"><i class="<?= esc($a->icon, 'attr') ?>"></i></span>
+                <span class="feed-shortcut__text"><?= esc($a->title) ?></span>
                 <i class="ti ti-external-link feed-shortcut__ext"></i>
             </a>
         <?php endforeach; ?>
     </div>
 </div>
+<?php endif; ?>
 
 </div><!-- /.feed-side-col -->
 

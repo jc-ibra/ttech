@@ -9,27 +9,9 @@
     return ($dt && $dt !== '0000-00-00 00:00:00') ? date('d/m/Y H:i', strtotime($dt)) : '—';
   };
 
-  // Sistemas externos disponibles (por ahora 2).
-  $sistemas = [
-    [
-      'title' => 'Help Desk',
-      'desc'  => 'Levanta y da seguimiento a tus tickets de soporte.',
-      'icon'  => 'ti ti-ticket',
-      'url'   => 'https://helpdesk.trantortechnologies.mx/',
-    ],
-    [
-      'title' => 'Documentación de uso GLPI',
-      'desc'  => 'Guias y documentacion para el uso de GLPI',
-      'icon'  => 'ti ti-book',
-      'url'   => 'https://docs.helpdesk.trantortechnologies.mx/',
-    ],
-    [
-      'title' => 'Correo Staff',
-      'desc'  => 'Accede a tu correo corporativo.',
-      'icon'  => 'ti ti-mail',
-      'url'   => 'https://mail.staff.trantortechnologies.mx/',
-    ],
-  ];
+  // Sistemas externos: administrables desde /configuracion.
+  // Devuelve un arreglo vacío si el bloque está apagado.
+  $sistemas = external_systems();
 ?>
 <div class="container-fluid mw-1600">
 
@@ -92,25 +74,27 @@
   </div>
 
   <!-- Sistemas externos -->
-  <div class="profile-section-title">
-    <h6>Sistemas externos</h6>
-    <span>Accesos rápidos a las plataformas de la empresa</span>
-  </div>
+  <?php if (!empty($sistemas)): ?>
+    <div class="profile-section-title">
+      <h6>Sistemas externos</h6>
+      <span>Accesos rápidos a las plataformas de la empresa</span>
+    </div>
 
-  <div class="row g-3">
-    <?php foreach ($sistemas as $s): ?>
-      <div class="col-sm-6 col-md-4 col-lg-3">
-        <a href="<?= $s['url'] ?>" target="_blank" rel="noopener" class="system-card">
-          <i class="ti ti-external-link system-card__ext"></i>
-          <div class="system-card__head">
-            <span class="system-card__icon"><i class="<?= $s['icon'] ?>"></i></span>
-            <span class="system-card__title"><?= $s['title'] ?></span>
-          </div>
-          <span class="system-card__desc"><?= $s['desc'] ?></span>
-        </a>
-      </div>
-    <?php endforeach; ?>
-  </div>
+    <div class="row g-3">
+      <?php foreach ($sistemas as $s): ?>
+        <div class="col-sm-6 col-md-4 col-lg-3">
+          <a href="<?= esc($s->url, 'attr') ?>" target="_blank" rel="noopener" class="system-card">
+            <i class="ti ti-external-link system-card__ext"></i>
+            <div class="system-card__head">
+              <span class="system-card__icon"><i class="<?= esc($s->icon, 'attr') ?>"></i></span>
+              <span class="system-card__title"><?= esc($s->title) ?></span>
+            </div>
+            <span class="system-card__desc"><?= esc($s->description) ?></span>
+          </a>
+        </div>
+      <?php endforeach; ?>
+    </div>
+  <?php endif; ?>
 </div>
 
 <!-- Modal: cambiar contraseña -->
