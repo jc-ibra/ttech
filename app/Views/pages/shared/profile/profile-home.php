@@ -54,6 +54,68 @@
     </p>
   </div>
 
+  <!-- Documentos RRHH -->
+  <div class="profile-section-title" id="hr-documents">
+    <h6>Documentos solicitados</h6>
+    <span>Archivos que RRHH te pidió cargar</span>
+  </div>
+
+  <?php
+    $hrDocs = $hrDocs ?? [];
+    $hrStatusLabel = [
+      'requested'    => 'Pendiente de carga',
+      'uploaded'     => 'Enviado a RRHH',
+      'under_review' => 'En revisión',
+      'accepted'     => 'Aceptado',
+      'rejected'     => 'Rechazado — vuelve a cargar',
+      'cancelled'    => 'Cancelado',
+    ];
+  ?>
+  <?php if (empty($hrDocs)): ?>
+    <div class="security-card" style="margin-bottom:1.25rem;">
+      <div class="security-card__info">
+        <span class="security-card__icon"><i class="ti ti-file-off"></i></span>
+        <div>
+          <span class="security-card__label">Sin solicitudes</span>
+          <span class="security-card__desc">Cuando RRHH te pida un documento, aparecerá aquí.</span>
+        </div>
+      </div>
+    </div>
+  <?php else: ?>
+    <div class="row g-3" style="margin-bottom:1.5rem;">
+      <?php foreach ($hrDocs as $doc): ?>
+        <?php $canUpload = in_array($doc->status, ['requested', 'rejected'], true); ?>
+        <div class="col-12 col-md-6">
+          <div class="security-card" style="flex-direction:column; align-items:stretch; gap:.75rem;">
+            <div class="security-card__info">
+              <span class="security-card__icon"><i class="ti ti-file-description"></i></span>
+              <div>
+                <span class="security-card__label"><?= esc($doc->document_name) ?></span>
+                <span class="security-card__desc"><?= esc($hrStatusLabel[$doc->status] ?? $doc->status) ?></span>
+                <?php if (!empty($doc->notes)): ?>
+                  <span class="security-card__desc"><?= esc($doc->notes) ?></span>
+                <?php endif; ?>
+                <?php if (!empty($doc->rejection_reason)): ?>
+                  <span class="security-card__desc" style="color:#b42318;">Motivo: <?= esc($doc->rejection_reason) ?></span>
+                <?php endif; ?>
+              </div>
+            </div>
+            <?php if ($canUpload): ?>
+              <form class="hr-doc-upload" data-id="<?= (int) $doc->id ?>" enctype="multipart/form-data">
+                <input type="hidden" name="<?= esc($csrfName) ?>" value="<?= esc($csrfHash) ?>">
+                <div style="display:flex; gap:.5rem; align-items:center; flex-wrap:wrap;">
+                  <input type="file" name="document" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" required class="form-control form-control-sm">
+                  <button type="submit" class="btn btn-primary btn-sm"><i class="ti ti-upload"></i> Subir</button>
+                </div>
+                <div class="hr-doc-msg text-sm mt-1" style="display:none;"></div>
+              </form>
+            <?php endif; ?>
+          </div>
+        </div>
+      <?php endforeach; ?>
+    </div>
+  <?php endif; ?>
+
   <!-- Seguridad -->
   <div class="profile-section-title">
     <h6>Seguridad</h6>
@@ -270,6 +332,50 @@
         error: function () {
           setLoading(false);
           showAlert('Ocurrió un error. Inténtalo de nuevo más tarde.');
+        }
+      });
+    });
+  })();
+
+  (function () {
+    var csrfName = '<?= $csrfName ?>';
+    var csrfHash = '<?= $csrfHash ?>';
+
+    $('.hr-doc-upload').on('submit', function (e) {
+      e.preventDefault();
+      var $form = $(this);
+      var id = $form.data('id');
+      var $msg = $form.find('.hr-doc-msg');
+      var fd = new FormData(this);
+      fd.set(csrfName, csrfHash);
+
+      $msg.hide().removeClass('text-danger text-success');
+      $form.find('button[type=submit]').prop('disabled', true);
+
+      $.ajax({
+        url: '<?= base_url('profile/hr-documents') ?>/' + id + '/upload',
+        type: 'POST',
+        data: fd,
+        processData: false,
+        contentType: false,
+        dataType: 'json',
+        success: function (res) {
+          if (res.csrf_name && res.csrf_token) {
+            csrfName = res.csrf_name;
+            csrfHash = res.csrf_token;
+          }
+          if (res.ok) {
+            $msg.addClass('text-success').text(res.message || 'Documento enviado').show();
+            setTimeout(function () { location.reload(); }, 800);
+          } else {
+            $msg.addClass('text-danger').text(res.error || 'No se pudo subir').show();
+            $form.find('button[type=submit]').prop('disabled', false);
+          }
+        },
+        error: function (xhr) {
+          var err = (xhr.responseJSON && xhr.responseJSON.error) || 'Error al subir el documento';
+          $msg.addClass('text-danger').text(err).show();
+          $form.find('button[type=submit]').prop('disabled', false);
         }
       });
     });

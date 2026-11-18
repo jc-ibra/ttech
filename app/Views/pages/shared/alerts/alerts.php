@@ -34,6 +34,11 @@
                   $title  = $alert->message . "<b> " . $alert->data->author_name . "</b>" . " publicó algo";
                 }
               }
+              if ($alert->type == 'hr_document') {
+                $icon = 'ti ti-file-description';
+                $action = base_url('profile#hr-documents');
+                $title  = esc($alert->message);
+              }
               if ($title === '') { $title = esc($alert->message); }
 
               $dateTxt = ucfirst($dateFmt->format(new \DateTime($alert->created_at)));

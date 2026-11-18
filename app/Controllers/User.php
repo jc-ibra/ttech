@@ -236,11 +236,15 @@ class User extends BaseController
 
     public function profile(): string
     {
+        $hrDocs = (new \App\Models\HrDocumentRequestModel())
+            ->listForUser((int) session('user')->id);
+
         return   view('shared/header',                     ['title' => 'Mi perfil'])
                 .view('shared/sidebar')
                 .view('shared/navbar')
                 .view('pages/shared/profile/profile-home', [
                                                                 'user'     => $this->userModel->getUsers(session('user')->id),
+                                                                'hrDocs'   => $hrDocs,
                                                                 'csrfName' => csrf_token(),
                                                                 'csrfHash' => csrf_hash(),
                                                             ])

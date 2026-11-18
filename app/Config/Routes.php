@@ -15,6 +15,7 @@ $routes->group('api/v1', ['filter' => 'api_auth'], function ($routes) {
     $routes->post('usuarios/(:segment)/desactivar',    'Api\Usuarios::desactivar/$1');
     $routes->post('usuarios/(:segment)/password',      'Api\Usuarios::actualizarPassword/$1');
     $routes->put('usuarios/(:segment)',                 'Api\Usuarios::actualizar/$1');
+    $routes->post('hr-documents/notify',               'Api\HrDocuments::notify');
 });
 
 /**************************************
@@ -46,6 +47,7 @@ $routes->group('', ['filter' => 'auth:admin,operator,user'], function($routes) {
     $routes->post('/profile/update/password', 'User::updatePassword');
     $routes->post('/profile/update/photo', 'User::updatePhoto');
     $routes->post('/profile/update/profile', 'User::updateProfile');
+    $routes->post('/profile/hr-documents/(:num)/upload', 'HrDocuments::upload/$1');
 
     /* Organization */
     $routes->get('/organization', 'Organization::index');
